@@ -3,11 +3,11 @@ namespace SmartKiwi.Models;
 public class Client
 {
     public string Name { get; set; }
-    public int WaiteTickt { get; set; }
-    public Client(string name, int waiteTickt)
+    public int WaiteTicket { get; set; }
+    public Client(string name, int waiteTicket)
     {
         Name = name;
-        WaiteTickt = waiteTickt;
+        WaiteTicket = waiteTicket;
 
     }
 }
