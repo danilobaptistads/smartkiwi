@@ -1,11 +1,12 @@
-namespace SmartKiwi.Models;
+namespace SmartKiwi.Models.Queuef;
 
 public class Queue
 {
     private Node first;
     private Node last;
     private int length;
-    private string Name { get; set; }
+    public DateTime? lastCall = null;
+    public string Name { get; }
     private int Priority { get; set; }
     public Queue(string name, int priority)
     {
@@ -39,7 +40,7 @@ public class Queue
 
             throw new InvalidOperationException();
         }
-        
+
         var currentNode = first;
         first = currentNode.NextNode;
         length--;
@@ -48,11 +49,15 @@ public class Queue
         {
             last = null;
         }
-        
-        
+
+
         return currentNode.data;
     }
     
+    public Client GetLastNode()
+    {
+        return last.data;
+    }
     public Boolean IsEmpty()
     {
         return length == 0;

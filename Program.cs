@@ -1,10 +1,19 @@
 ﻿using Microsoft.VisualBasic;
 using SmartKiwi.Models;
+using SmartKiwi.Models.Queuef;
 
-PriorityController.Aging(0.5);
-int i = 0;
-while (true)
-{
-    System.Console.WriteLine(i++);
-    Thread.Sleep(1000);
-}
+var queueList = new List<Queue>();
+
+var prio = new Queue("0", 3);
+var comun = new Queue("1", 2);
+
+queueList.Add(prio);
+queueList.Add(comun);
+var checkIn = new checkIn(queueList);
+
+checkIn.Exec();
+
+var Client = queueList[0].Dequeue();
+
+System.Console.WriteLine(Client.WaiteTicket);
+
