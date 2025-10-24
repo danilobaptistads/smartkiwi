@@ -5,6 +5,7 @@ public class Queue
     private Node first;
     private Node last;
     private int length;
+    public int curretPriority;
     public DateTime? lastCall = null;
     public string Name { get; }
     private int Priority { get; set; }
@@ -15,6 +16,7 @@ public class Queue
         first = null;
         length = 0;
         Priority = priority;
+        curretPriority = priority;
     }
 
     public void Enqueue(Client client)
@@ -28,6 +30,7 @@ public class Queue
             return;
         }
         first = newNode;
+        last = newNode;
         length++;
 
 
@@ -37,7 +40,7 @@ public class Queue
     {
         if (IsEmpty())
         {
-
+            System.Console.WriteLine(Name);
             throw new InvalidOperationException();
         }
 

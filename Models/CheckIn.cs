@@ -25,7 +25,6 @@ public class checkIn
         selectedQueue.Enqueue(newclient);
 
     }
-
     private Queue GetQueue()
     {
         foreach (var queue in QueueList)
@@ -37,15 +36,15 @@ public class checkIn
         }
         throw new InvalidOperationException($"Fila '{nameQueue}' não encontrada.");
     }
-    private int GenTickt(Queue queue)
+    private int GenTickt(Queue selectedQueue)
     {
           
-        if (queue.IsEmpty() && queue.lastCall == null)
+        if (selectedQueue.IsEmpty() && selectedQueue.lastCall == null)
         {
             return 1;
         }
         
-        var lastNodeTicket = queue.GetLastNode().WaiteTicket;
+        var lastNodeTicket = selectedQueue.GetLastNode().WaiteTicket;
         return lastNodeTicket++;
 
     }
