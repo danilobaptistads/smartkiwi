@@ -56,23 +56,28 @@ public class QueueController
         {
             if (queue.lastCall == null && !queue.IsEmpty())
             {
+                System.Console.WriteLine("primeira chamada");
                 callCounter++;
                 queue.lastCall = currentTime;
                 return queue.Dequeue();
             }
             if (!queue.IsEmpty() && callCounter <= queue.curretPriority)
-                {
-                    callCounter++;
-                    queue.lastCall = currentTime;
-                    return queue.Dequeue();
-                }
-                else
-                {
-                    callCounter = 0;
-                    continue;
-                }
+            {
+                callCounter++;
+                queue.lastCall = currentTime;
+                System.Console.WriteLine(" chamada normal");
+                return queue.Dequeue();
+                
+            }
+            else
+            {
+                System.Console.WriteLine("afila zerou");
+                callCounter = 0;
+                continue;
+            }
         }
-        return null;           
+        System.Console.WriteLine("passou todas as condições");
+        return null;        
     }
     private void Aging(int maxAge, DateTime currentTime)
     {
