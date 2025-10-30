@@ -1,4 +1,4 @@
-namespace SmartKiwi.Models.Queuef;
+namespace SmartKiwi.Models;
 
 internal class Node
 {

@@ -1,10 +1,10 @@
-namespace SmartKiwi.Models.Queuef;
+namespace SmartKiwi.Models;
 
 public class Queue
 {
     private Node first;
     private Node last;
-    private int length;
+    public int length;
     public int curretPriority;
     public DateTime? lastCall = null;
     public string Name { get; }

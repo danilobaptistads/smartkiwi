@@ -1,5 +1,6 @@
-namespace SmartKiwi.Models;
-using SmartKiwi.Models.Queuef;
+namespace SmartKiwi.Services;
+
+using SmartKiwi.Models;
 public class Attendante
 {
     private QueueController QueueController { get; set; }
