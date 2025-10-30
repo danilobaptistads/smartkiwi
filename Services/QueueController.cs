@@ -38,11 +38,12 @@ public class QueueController
         if (PrioritiesMatch == false)
         {
             currentQueueList = MainQueueList;
-
+            System.Console.WriteLine(" chamada normal");
         }
         else
         {
             currentQueueList = DynamicQueueList;
+            Console.WriteLine(" chamada normal");
         }
 
         return SearchNext(currentQueueList, currentTime);
@@ -55,7 +56,7 @@ public class QueueController
         {
             if (queue.lastCall == null && !queue.IsEmpty())
             {
-                System.Console.WriteLine("primeira chamada");
+                Console.WriteLine("primeira chamada");
                 callCounter++;
                 queue.lastCall = currentTime;
                 return queue.Dequeue();
@@ -64,7 +65,7 @@ public class QueueController
             {
                 callCounter++;
                 queue.lastCall = currentTime;
-                System.Console.WriteLine(" chamada normal");
+                
                 return queue.Dequeue();
                 
             }

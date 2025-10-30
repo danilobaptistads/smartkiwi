@@ -8,7 +8,9 @@ public class checkIn
     {
         try
         {
+
             var waiteTicket = GenTickt(selectedQueue);
+            
             var newClient = new Client(clientName, waiteTicket);
             selectedQueue.Enqueue(newClient);
             return newClient;
@@ -21,8 +23,9 @@ public class checkIn
         
     }
 
-    private int GenTickt(Queue selectedQueue)
+    public static int GenTickt(Queue selectedQueue)
     {
+        
 
         if (selectedQueue.IsEmpty() && selectedQueue.lastCall == null)
         {
@@ -30,7 +33,8 @@ public class checkIn
         }
 
         var lastNodeTicket = selectedQueue.GetLastNode().WaiteTicket;
-        return lastNodeTicket++;
+
+        return ++lastNodeTicket;
 
     }
         
