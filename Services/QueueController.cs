@@ -4,53 +4,58 @@ public class QueueController
 {
     private List<Queue> MainQueueList;
     private List<Queue> DynamicQueueList;
+    private List<Queue> currentQueueList;
     private int callCounter;
     private int MaxWaite;
-    private DateTime? lastAgingCheck;
+    //private DateTime? lastAgingCheck;
     private int MaxPriority;
-    private List<Queue> currentQueueList;
-    bool PrioritiesMatch;
+    private Aging aging;
+    private PrioritiesMatcher prioritiesMatcher;
+    private CycleChecker cycleChecker;
+    bool HasPrioritieMatch;
     public QueueController(List<Queue> queueList, int maxWaite)
     {
         callCounter = 0;
         MaxWaite = maxWaite;
         MainQueueList = queueList;
-        lastAgingCheck = null;
+        //lastAgingCheck = null;
+        HasPrioritieMatch = false;
+        MaxPriority = MainQueueList[0].currentPriority;
         DynamicQueueList = new List<Queue>();
-        MaxPriority = MainQueueList[0].curretPriority;
-        PrioritiesMatch = false;
-
-
+        cycleChecker = new CycleChecker(MaxWaite);
+        aging = new Aging(MainQueueList, MaxWaite, MaxPriority);
+        prioritiesMatcher = new PrioritiesMatcher(MainQueueList, DynamicQueueList);
+        
     }
-    public Client WhosNext()
+    public Client AdvanceQueue()
     {
        
         var currentTime = DateTime.Now;
-        var newCicle = CheckCycle(MaxWaite, currentTime);
+        var newCycle = cycleChecker.exec();
 
-        if (newCicle)
+        if (newCycle)
         {
-            Aging(MaxWaite, currentTime);
-            PrioritiesMatch = CheckPrioritiesMatch(PrioritiesMatch);
+            aging.Exec(currentTime);
+            HasPrioritieMatch = prioritiesMatcher.check(HasPrioritieMatch);
 
         }
 
-        if (PrioritiesMatch == false)
+        if (HasPrioritieMatch == false)
         {
             currentQueueList = MainQueueList;
-            System.Console.WriteLine(" chamada normal");
+            Console.WriteLine(" chamada Comum");
         }
         else
         {
             currentQueueList = DynamicQueueList;
-            Console.WriteLine(" chamada normal");
+            Console.WriteLine(" chamada Dinamica");
         }
 
-        return SearchNext(currentQueueList, currentTime);
+        return GetClient(currentQueueList, currentTime);
         
 
     }
-    private Client SearchNext(List<Queue> currentQueueList, DateTime currentTime)
+    private Client GetClient(List<Queue> currentQueueList, DateTime currentTime)
     {
         foreach (var queue in currentQueueList)
         {
@@ -61,7 +66,7 @@ public class QueueController
                 queue.lastCall = currentTime;
                 return queue.Dequeue();
             }
-            if (!queue.IsEmpty() && callCounter <= queue.curretPriority)
+            if (!queue.IsEmpty() && callCounter <= queue.currentPriority)
             {
                 callCounter++;
                 queue.lastCall = currentTime;
@@ -71,72 +76,16 @@ public class QueueController
             }
             else
             {
-                System.Console.WriteLine("afila zerou");
+                Console.WriteLine("afila zerou");
                 callCounter = 0;
                 continue;
             }
         }
-        System.Console.WriteLine("passou todas as condições");
+                Console.WriteLine("passou todas as condições");
         return null;        
     }
-    private void Aging(int maxAge, DateTime currentTime)
-    {
 
-        foreach (var queue in MainQueueList)
-            {
-                var timeElapsed = currentTime - queue.lastCall;
-
-                if (timeElapsed >= TimeSpan.FromMinutes(maxAge) && queue.curretPriority < MaxPriority)
-                {
-                        queue.curretPriority++;
-                }
-                    
-            }
-    }
-    private bool CheckPrioritiesMatch(bool PrioritiesMatch)
-    {
-        if (PrioritiesMatch != true)
-        {
-
-            for (var i = 1; i < (MainQueueList.Count + 1); i++)
-            {
-                if (MainQueueList[i].IsEmpty() && DynamicQueueList.Contains(MainQueueList[i]))
-                {
-                    DynamicQueueList.Remove(MainQueueList[i]);
-                    continue;
-                }
-
-                if (MainQueueList[0].curretPriority == MainQueueList[i].curretPriority)
-                {
-                    DynamicQueueList.Add(MainQueueList[i]);
-                    PrioritiesMatch = true;
-                }
-            }
-        }
-        else
-        {
-            DynamicQueueList.Clear();
-            PrioritiesMatch = false;
-        }
-        return PrioritiesMatch;
-    }
-    private bool CheckCycle(int maxWaite, DateTime currentTime)
-    {
-
-        if (lastAgingCheck != null)
-        {
-            var TimeElapsed = currentTime - lastAgingCheck;
-
-            if (TimeElapsed >= TimeSpan.FromMinutes(maxWaite))
-            {
-                lastAgingCheck = currentTime;
-                return true;
-            }
-        }
-        
-        lastAgingCheck = currentTime;
-        return false;
-
-    }
+    
+    
     
 }

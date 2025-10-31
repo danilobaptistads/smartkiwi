@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SmartKiwi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5766ca549180a2c0203c98a8a7f0b7b6c9e045d1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+db2bfd26375fae02cb2d36b038d995da6263580a")]
 [assembly: System.Reflection.AssemblyProductAttribute("SmartKiwi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SmartKiwi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

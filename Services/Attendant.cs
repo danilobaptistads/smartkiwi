@@ -11,10 +11,10 @@ public class Attendante
 
     public void CallNext()
     {
-        var called = QueueController.WhosNext();
+        var called = QueueController.AdvanceQueue();
         if(called == null)
         {
-            System.Console.WriteLine("Não háfila de espera");
+            Console.WriteLine("Não háfila de espera");
             return;
         }
         Show(called);

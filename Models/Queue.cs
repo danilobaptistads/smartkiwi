@@ -5,7 +5,7 @@ public class Queue
     private Node first;
     private Node last;
     public int length;
-    public int curretPriority;
+    public int currentPriority;
     public DateTime? lastCall = null;
     public string Name { get; }
     private int Priority { get; set; }
@@ -16,7 +16,7 @@ public class Queue
         first = null;
         length = 0;
         Priority = priority;
-        curretPriority = priority;
+        currentPriority = priority;
     }
 
     public void Enqueue(Client client)
