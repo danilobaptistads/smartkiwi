@@ -1,5 +1,7 @@
 
 namespace SmartKiwi.Services;
+
+using System.Net.WebSockets;
 using SmartKiwi.Models;
 public class Aging
 {
@@ -16,16 +18,34 @@ public class Aging
     }
     public void Exec(DateTime currentTime)
     {
-
+        Console.WriteLine("Rodando Aging");
         foreach (var queue in MainQueueList)
         {
-            var timeElapsed = currentTime - queue.lastCall;
+            var timeElapsedFromLastCall = currentTime - queue.lastCall;
 
-            if (timeElapsed >= TimeSpan.FromMinutes(MaxWaite) && queue.curretPriority < MaxPriority)
+            System.Console.WriteLine(timeElapsedFromLastCall);
+            if (timeElapsedFromLastCall >= TimeSpan.FromMinutes(MaxWaite))
             {
-                Console.WriteLine("Fila envelheceu");
-                ++queue.curretPriority;
+                if (queue.currentPriority < MaxPriority)
+                {
+                    Console.WriteLine("Fila envelheceu");
+                    ++queue.currentPriority;
+                }
+                else
+                {
+                    ResetPriority();
+                }
             }
+
+        }
+    }
+
+    public void ResetPriority()
+    {
+        Console.WriteLine("Resetando prio");
+        for (var i = 1; i < MainQueueList.Count; i++)
+        {
+            MainQueueList[i].ResetPriorit();
 
         }
     }

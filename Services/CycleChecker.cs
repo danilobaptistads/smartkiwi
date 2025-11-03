@@ -1,30 +1,33 @@
+using System.Runtime.InteropServices.Marshalling;
+
 public class CycleChecker
 {
     private int MaxWaite;
     private DateTime? LastAgingCheck;
+    private int i = 0;
     public CycleChecker(int maxWaite)
     {
         MaxWaite = maxWaite;
-        LastAgingCheck = null;
+        LastAgingCheck = DateTime.Now;
+        i = 0;
     }
     public bool exec()
     {
-
-        if (LastAgingCheck != null)
+        i++;
+        var TimeElapsed = DateTime.Now - LastAgingCheck;
+        if (TimeElapsed >= TimeSpan.FromMinutes(MaxWaite))
         {
-            var TimeElapsed = DateTime.Now - LastAgingCheck;
-
-            if (TimeElapsed >= TimeSpan.FromMinutes(MaxWaite))
-            {
-                System.Console.WriteLine("Passou 1 minuto");
-                LastAgingCheck = DateTime.Now;
-                return true;
-            }
+            Console.WriteLine($"Passou {i} segundos");
+            LastAgingCheck = DateTime.Now;
+            
+            return true;
         }
-        System.Console.WriteLine("não é um novo ciclo");
-        LastAgingCheck = DateTime.Now;
+ 
+        Console.WriteLine("não é um novo ciclo");
+   
         return false;
-    } 
+        }
+        
 }
 
 

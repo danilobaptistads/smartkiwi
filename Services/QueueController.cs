@@ -1,4 +1,5 @@
 namespace SmartKiwi.Services;
+
 using SmartKiwi.Models;
 public class QueueController
 {
@@ -25,17 +26,18 @@ public class QueueController
         cycleChecker = new CycleChecker(MaxWaite);
         aging = new Aging(MainQueueList, MaxWaite, MaxPriority);
         prioritiesMatcher = new PrioritiesMatcher(MainQueueList, DynamicQueueList);
-        
+
     }
     public Client AdvanceQueue()
     {
-       
+
         var currentTime = DateTime.Now;
         var newCycle = cycleChecker.exec();
 
         if (newCycle)
         {
             aging.Exec(currentTime);
+
             HasPrioritieMatch = prioritiesMatcher.check(HasPrioritieMatch);
 
         }
@@ -52,7 +54,7 @@ public class QueueController
         }
 
         return GetClient(currentQueueList, currentTime);
-        
+
 
     }
     private Client GetClient(List<Queue> currentQueueList, DateTime currentTime)
@@ -70,9 +72,9 @@ public class QueueController
             {
                 callCounter++;
                 queue.lastCall = currentTime;
-                
+
                 return queue.Dequeue();
-                
+
             }
             else
             {
@@ -81,11 +83,11 @@ public class QueueController
                 continue;
             }
         }
-                Console.WriteLine("passou todas as condições");
-        return null;        
+        Console.WriteLine("passou todas as condições");
+        return null;
     }
 
-    
-    
-    
+
+
+
 }
