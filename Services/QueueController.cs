@@ -19,7 +19,6 @@ public class QueueController
         callCounter = 0;
         MaxWaite = maxWaite;
         MainQueueList = queueList;
-        //lastAgingCheck = null;
         HasPrioritieMatch = false;
         MaxPriority = MainQueueList[0].currentPriority;
         DynamicQueueList = new List<Queue>();

@@ -1,12 +1,13 @@
-﻿using System.Net.NetworkInformation;
+﻿using SmartKiwi.Controller;
 using SmartKiwi.Models;
 using SmartKiwi.Services;
 
 var queueList = new List<Queue>(); //Criando lista de filas
+var dinqueueList = new List<Queue>();
 
 //criando filas para teste
-var prio = new Queue("Prio", 10); 
-var comun = new Queue("Comum", 2);
+var prio = new Queue("Prio", 3); 
+var comun = new Queue("Comum", 3);
 //Adicionando filas na lista
 queueList.Add(prio);
 queueList.Add(comun);
@@ -23,6 +24,9 @@ checkIn.Exec("zexinho", prio);
 checkIn.Exec("luizinho", prio);
 checkIn.Exec("huginho", prio);
 checkIn.Exec("patinhas", prio);
+checkIn.Exec("margarida", prio);
+checkIn.Exec("pluto", prio);
+checkIn.Exec("donald", prio);
 checkIn.Exec("jenifer", comun);
 checkIn.Exec("otto", comun);
 checkIn.Exec("chaves", comun);
@@ -34,27 +38,36 @@ checkIn.Exec("florinda", comun);
 //iniciando queueController
 var newQeueController = new QueueController(queueList, 1);
 //Iniciando atendiento
-// var atendimento = new AttendantUi(newQeueController);
 
-// atendimento.Exec();
-var maxPriority = queueList[0].currentPriority;
-var aging = new Aging(queueList, 1, maxPriority);
+// var maxPriority = queueList[0].currentPriority;
+// var aging = new Aging(queueList, 1, maxPriority);
+var pmatcher = new PrioritiesMatcher(queueList,dinqueueList);
+//var atendimento = new AttendantUi(newQeueController);
+//comun.lastCall = DateTime.Now;
+//atendimento.Exec();
 
-comun.lastCall = DateTime.Now;
 
-var i = 0;
-var checkcycle = new CycleChecker(1);
-while (true)
-{
+var hasPrioritieMatch = false;
+System.Console.WriteLine($"TAmanho da fila dinamica: {dinqueueList.Count}");
+var retornoPmachr = pmatcher.check(hasPrioritieMatch);
 
-    checkcycle.exec();
+System.Console.WriteLine($"retorno da fun~çao : {retornoPmachr}\n");
+System.Console.WriteLine($"TAmanho da fila dinamica: {dinqueueList.Count}");
 
-    ++i;
-    System.Console.WriteLine($"rodou {i} vezes");
-    Thread.Sleep(1000);
-    
-    
-}
+prio.length = 0;
+
+retornoPmachr = pmatcher.check(hasPrioritieMatch);
+
+System.Console.WriteLine($"retorno da fun~çao : {retornoPmachr}\n");
+System.Console.WriteLine($"TAmanho da fila dinamica: {dinqueueList.Count}");
+
+System.Console.WriteLine($"retorno da fun~çao : {retornoPmachr}\n");
+System.Console.WriteLine($"TAmanho da fila dinamica: {dinqueueList.Count}");
+
+
+
+
+
 
 
 
