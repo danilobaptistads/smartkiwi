@@ -22,7 +22,7 @@ public class CycleChecker
             
             return true;
         }
-    
+        LastAgingCheck = DateTime.Now;
         return false;
         }
         
