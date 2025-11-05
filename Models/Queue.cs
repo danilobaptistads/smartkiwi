@@ -8,7 +8,7 @@ public class Queue
     public int currentPriority;
     public DateTime? lastCall = null;
     public string Name { get; }
-    private int Priority { get; set; }
+    public int Priority { get; }
     public Queue(string name, int priority)
     {
         Name = name;
