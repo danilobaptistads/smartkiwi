@@ -13,28 +13,19 @@ public class PrioritiesMatcher
     }
     public bool check(bool hasPrioritieMatch)
     {
+
         if (hasPrioritieMatch != true)
         {
 
             for (var i = 1; i < MainQueueList.Count; i++)
             {
-                if (MainQueueList[0].IsEmpty() 
-                    && DynamicQueueList.Contains(MainQueueList[0]))
-                {
-                    DynamicQueueList.Remove(MainQueueList[0]);
-                    continue;
-                }
-                if (MainQueueList[i].IsEmpty()
-                    && DynamicQueueList.Contains(MainQueueList[i]))
-                {
-                    DynamicQueueList.Remove(MainQueueList[i]);
-                    continue;
-                }
 
-                if (MainQueueList[0].currentPriority == MainQueueList[i].currentPriority
+                if (MainQueueList[0].Priority == MainQueueList[i].currentPriority
                     && !DynamicQueueList.Contains(MainQueueList[i]))
                 {
-                    InitializeDynamicQueueList();
+
+                    System.Console.WriteLine("Tem prioridade");
+                    MainQueueList[i].currentPriority = 1;
                     DynamicQueueList.Add(MainQueueList[i]);
                     hasPrioritieMatch = true;
                 }
@@ -45,15 +36,11 @@ public class PrioritiesMatcher
             DynamicQueueList.Clear();
             hasPrioritieMatch = false;
         }
-        return hasPrioritieMatch;
-    }
-
-    private void InitializeDynamicQueueList()
-    {
-        if (!DynamicQueueList.Contains(MainQueueList[0]))
+        if (hasPrioritieMatch == true)
         {
-            DynamicQueueList.Add(MainQueueList[0]);
+            DynamicQueueList[0].currentPriority = 1;
         }
+        return hasPrioritieMatch;
     }
     
 }

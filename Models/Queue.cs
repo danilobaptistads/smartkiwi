@@ -66,10 +66,7 @@ public class Queue
         return length == 0;
     }
 
-    public void ResetPriorit()
-    {
-        currentPriority = Priority;
-    }
+
 }
 
 
