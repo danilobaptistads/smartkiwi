@@ -1,5 +1,6 @@
 namespace SmartKiwi.Services;
 
+using System.Runtime.CompilerServices;
 using SmartKiwi.Models;
 public class QueueController
 {
@@ -13,13 +14,18 @@ public class QueueController
     private Aging aging;
     private PrioritiesMatcher prioritiesMatcher;
     private CycleChecker cycleChecker;
+    private int MaxQueueListIndex;
+    private int QueueListCurrenIndex;
     bool HassPrioritieMatch;
+    int queueListCount;
     public QueueController(List<Queue> queueList, int maxWaite)
     {
         callCounter = 0;
         MaxWaite = maxWaite;
         MainQueueList = queueList;
         HassPrioritieMatch = false;
+        MaxQueueListIndex = MainQueueList.Count;
+        QueueListCurrenIndex = 0;
         MaxPriority = MainQueueList[0].Priority;
         DynamicQueueList = new List<Queue>() { MainQueueList[0] };
         cycleChecker = new CycleChecker(MaxWaite);
@@ -64,33 +70,41 @@ public class QueueController
         {
             foreach (var queue in currentQueueList)
             {
-                queue.lastCall = DateTime.Now;
+                queue.lastCall = currentTime;
             }
         }
-        foreach (var queue in currentQueueList)
+        
+        var queueListCount = 0;
+        
+        while (queueListCount <= currentQueueList.Count)
         {
 
-            if (!queue.IsEmpty())
+            var currentQueue = currentQueueList[QueueListCurrenIndex];
+            
+            if (currentQueue.IsEmpty())
             {
-                if (callCounter <= queue.currentPriority)
-                {
-                    callCounter++;
-                    queue.lastCall = currentTime;
-                    return queue.Dequeue();
-                }
-                else
-                {
-
-                    callCounter = 0;
-                    continue;
-                }
-
+                callCounter = 0;
+                QueueListCurrenIndex = (QueueListCurrenIndex + 1) % currentQueueList.Count;
+                queueListCount++;
+                continue;
             }
             
+            if (callCounter < currentQueue.currentPriority)
+            {
+                var client = currentQueue.Dequeue();
+                ++callCounter;
+                return client;
+            }
 
+
+            callCounter = 0;
+            QueueListCurrenIndex = (QueueListCurrenIndex + 1) % currentQueueList.Count;
+            queueListCount++;
         }
-
+        
         return null;
     }
+    
+
 
 }
