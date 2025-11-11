@@ -81,15 +81,7 @@ public class QueueController
 
             var currentQueue = currentQueueList[QueueListCurrenIndex];
             
-            if (currentQueue.IsEmpty())
-            {
-                callCounter = 0;
-                QueueListCurrenIndex = (QueueListCurrenIndex + 1) % currentQueueList.Count;
-                queueListCount++;
-                continue;
-            }
-            
-            if (callCounter < currentQueue.currentPriority)
+            if (!currentQueue.IsEmpty() && callCounter < currentQueue.currentPriority)
             {
                 var client = currentQueue.Dequeue();
                 ++callCounter;
