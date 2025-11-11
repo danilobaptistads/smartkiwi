@@ -4,11 +4,11 @@ using SmartKiwi.Models;
 public class PrioritiesMatcher
 {
     List<Queue> MainQueueList;
-    List<Queue> DynamicQueueList;
-    public PrioritiesMatcher(List<Queue> mainQueueList, List<Queue> dynamicQueueList)
+    
+    public PrioritiesMatcher(List<Queue> mainQueueList)
     {
         MainQueueList= mainQueueList;
-        DynamicQueueList = dynamicQueueList;
+    
         
     }
     public bool check(bool hasPrioritieMatch)
@@ -20,25 +20,23 @@ public class PrioritiesMatcher
             for (var i = 1; i < MainQueueList.Count; i++)
             {
 
-                if (MainQueueList[0].Priority == MainQueueList[i].currentPriority
-                    && !DynamicQueueList.Contains(MainQueueList[i]))
+                if (MainQueueList[0].Priority == MainQueueList[i].currentPriority)
                 {
 
-                    System.Console.WriteLine("Tem prioridade");
                     MainQueueList[i].currentPriority = 1;
-                    DynamicQueueList.Add(MainQueueList[i]);
+        
                     hasPrioritieMatch = true;
                 }
             }
         }
         else
         {
-            DynamicQueueList.Clear();
+
             hasPrioritieMatch = false;
         }
         if (hasPrioritieMatch == true)
         {
-            DynamicQueueList[0].currentPriority = 1;
+            MainQueueList[0].currentPriority = 1;
         }
         return hasPrioritieMatch;
     }

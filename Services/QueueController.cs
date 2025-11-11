@@ -1,19 +1,15 @@
 namespace SmartKiwi.Services;
 
-using System.Runtime.CompilerServices;
 using SmartKiwi.Models;
 public class QueueController
 {
     private List<Queue> MainQueueList;
-    private List<Queue> DynamicQueueList;
-    private List<Queue> currentQueueList;
     private int callCounter;
     private int MaxWaite;
     private int MaxPriority;
     private Aging aging;
     private PrioritiesMatcher prioritiesMatcher;
     private CycleChecker cycleChecker;
-    private int MaxQueueListIndex;
     private int QueueListCurrenIndex;
     bool HassPrioritieMatch;
     public QueueController(List<Queue> queueList, int maxWaite)
@@ -22,13 +18,11 @@ public class QueueController
         MaxWaite = maxWaite;
         MainQueueList = queueList;
         HassPrioritieMatch = false;
-        MaxQueueListIndex = MainQueueList.Count;
         QueueListCurrenIndex = 0;
         MaxPriority = MainQueueList[0].Priority;
-        DynamicQueueList = new List<Queue>() { MainQueueList[0] };
         cycleChecker = new CycleChecker(MaxWaite);
         aging = new Aging(MainQueueList, MaxWaite, MaxPriority);
-        prioritiesMatcher = new PrioritiesMatcher(MainQueueList, DynamicQueueList);
+        prioritiesMatcher = new PrioritiesMatcher(MainQueueList);
 
     }
     public Client AdvanceQueue()
@@ -40,33 +34,38 @@ public class QueueController
         if (newCycle)
         {
             aging.Exec(currentTime);
-
+            System.Console.WriteLine($"é um novo ciclo HassPrioritieMatch é {HassPrioritieMatch}");
+            if(HassPrioritieMatch == true)
+            {
+                aging.ResetPriority();
+                callCounter = 0;
+                System.Console.WriteLine($"prioridades resetadas");
+            }
             HassPrioritieMatch = prioritiesMatcher.check(HassPrioritieMatch);
+            Console.WriteLine($" HassPrioritieMatch atual é {HassPrioritieMatch}");
 
-            Console.WriteLine($"priotiesmatcher é : {HassPrioritieMatch}");
 
         }
 
         if (HassPrioritieMatch == false)
         {
-            currentQueueList = MainQueueList;
+ 
             Console.WriteLine(" chamada Comum");
         }
         else
         {
-            currentQueueList = DynamicQueueList;
             Console.WriteLine(" chamada Dinamica");
         }
 
-        return GetClient(currentQueueList, currentTime);
+        return GetClient(MainQueueList, currentTime);
 
 
     }
-    private Client GetClient(List<Queue> currentQueueList, DateTime currentTime)
+    private Client GetClient(List<Queue> QueueList, DateTime currentTime)
     {
-        if (currentQueueList[0].lastCall == null)
+        if (MainQueueList[0].lastCall == null)
         {
-            foreach (var queue in currentQueueList)
+            foreach (var queue in MainQueueList)
             {
                 queue.lastCall = currentTime;
             }
@@ -74,10 +73,10 @@ public class QueueController
         
         var queueListCount = 0;
         
-        while (queueListCount <= currentQueueList.Count)
+        while (queueListCount <= MainQueueList.Count)
         {
 
-            var currentQueue = currentQueueList[QueueListCurrenIndex];
+            var currentQueue = MainQueueList[QueueListCurrenIndex];
             
             if (!currentQueue.IsEmpty() && callCounter < currentQueue.currentPriority)
             {
@@ -88,7 +87,7 @@ public class QueueController
 
 
             callCounter = 0;
-            QueueListCurrenIndex = (QueueListCurrenIndex + 1) % currentQueueList.Count;
+            QueueListCurrenIndex = (QueueListCurrenIndex + 1) % MainQueueList.Count;
             queueListCount++;
         }
         
