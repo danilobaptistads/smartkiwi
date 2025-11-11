@@ -9,7 +9,6 @@ public class QueueController
     private List<Queue> currentQueueList;
     private int callCounter;
     private int MaxWaite;
-    //private DateTime? lastAgingCheck;
     private int MaxPriority;
     private Aging aging;
     private PrioritiesMatcher prioritiesMatcher;
@@ -17,7 +16,6 @@ public class QueueController
     private int MaxQueueListIndex;
     private int QueueListCurrenIndex;
     bool HassPrioritieMatch;
-    int queueListCount;
     public QueueController(List<Queue> queueList, int maxWaite)
     {
         callCounter = 0;
