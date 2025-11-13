@@ -16,7 +16,6 @@ public class QueueBuilder
             if (isPriorityQueue == true)
             {
                 newQueue.IsPriorityQueue();
-                QueueList.Add(newQueue);
 
             }
             
@@ -50,11 +49,16 @@ public class QueueBuilder
     {
         var basePriority = QueueList.Count;
 
-        foreach(var queue in QueueList)
+        foreach (var queue in QueueList)
         {
             queue.SetPriority(basePriority);
             basePriority--;
         }
+    }
+    
+    public List<Queue> ListExistentQueues()
+    {
+        return QueueList;
     }
 }
 
