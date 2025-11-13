@@ -8,15 +8,15 @@ public class Queue
     public int currentPriority;
     public DateTime? lastCall = null;
     public string Name { get; }
-    public int Priority { get; }
-    public Queue(string name, int priority)
+    public int Priority { get; private set; }
+    public bool PriorityQueue { get; private set; }
+    public Queue(string name)
     {
         Name = name;
         last = null;
         first = null;
         length = 0;
-        Priority = priority;
-        currentPriority = priority;
+        IsPriorityQueue(false);
     }
 
     public void Enqueue(Client client)
@@ -56,7 +56,7 @@ public class Queue
 
         return currentNode.data;
     }
-    
+
     public Client GetLastNode()
     {
         return last.data;
@@ -65,7 +65,15 @@ public class Queue
     {
         return length == 0;
     }
-
+    public void IsPriorityQueue(bool priorityQueue = true)
+    {
+        PriorityQueue = priorityQueue;
+    }
+    public void SetPrioritie(int priority)
+    {
+        Priority = priority;
+        currentPriority = Priority;
+    }
 
 }
 
