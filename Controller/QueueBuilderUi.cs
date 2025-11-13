@@ -10,51 +10,91 @@ public class QueueBuilderUi
     }
     public void Exec()
     {
-        string chose;
+
+        bool process = true;
         do
         {
-            var queueName = "";
-            while (queueName == "")
+            DisplayQueues();
+
+            var queueName = ChoseName();
+
+            var isPriorityQueue = IsQueuePriority(queueName);
+
+            if (isPriorityQueue)
             {
-                Console.Clear();
-                Console.WriteLine("Digite o nome da fila");
-                queueName = Console.ReadLine();
-                if (queueName == "")
-                {
-                    Console.WriteLine("Nome da fila inválido");
-                    Thread.Sleep(2000);
-                }
+                QueueBuilder.Build(queueName, isPriorityQueue);
             }
-            int queuePriority;
-            var returnUser = false;
-
-            while (returnUser == false)
+            else
             {
-                Console.WriteLine("Digite a prioridade da fila");
-                returnUser = int.TryParse(Console.ReadLine(), out queuePriority);
-                if (returnUser)
-                {
-
-                    if (QueueBuilder.Build(queueName, queuePriority))
-                    {
-                        returnUser = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Não foi possivel criar a fila tente novamente");
-                        Thread.Sleep(2000);
-
-                    }
-
-                }
-                else
-                {
-                    Console.WriteLine("Entrada Inválida,digite um numero inteiro");
-                    Thread.Sleep(2000);
-                }
+                QueueBuilder.Build(queueName);
             }
 
+            DisplayQueues();
 
+            process = Process();
+
+
+        } while (!process);
+
+
+    }
+
+    private string ChoseName()
+    {
+        var queueName = "";
+        while (queueName == "")
+        {
+            Console.WriteLine("Digite o nome da fila");
+            queueName = Console.ReadLine();
+            if (queueName == "")
+            {
+                Console.WriteLine("Nome da fila inválido");
+                Thread.Sleep(2000);
+            }
+        }
+        return queueName;
+    }
+    private bool IsQueuePriority(string queueName)
+    {
+        var answer = "";
+        while (answer != "s" && answer != "n")
+        {
+            Console.WriteLine($"{queueName} fila prioritária? (S/N)");
+            answer = Console.ReadLine().ToLower();
+            if (answer == "n")
+            {
+                return false;
+            }
+
+        }
+        return true;
+    }
+
+    private void DisplayQueues()
+    {
+        Console.Clear();
+        var ExistentQueues = QueueBuilder.ListExistentQueues();
+
+        System.Console.WriteLine("Listas:\n");
+        foreach (var queue in ExistentQueues)
+        {
+
+            if (queue.PriorityQueue)
+            {
+                System.Console.WriteLine($"{queue.Name}  Prioritária");
+            }
+            else
+            {
+                Console.WriteLine($"{queue.Name}");
+            }
+        }
+    }
+
+    private bool Process()
+    {
+        string chose = "";
+        while (chose != "S" && chose != "N")
+        {
             Console.WriteLine("Deseja criar outra fila? \n'S' sim / 'N' não");
             chose = Console.ReadLine().ToUpper();
 
@@ -64,15 +104,14 @@ public class QueueBuilderUi
                     break;
 
                 case "N":
-                    return;
+                    return true;
 
                 default:
                     Console.WriteLine("Opção inválida! Digite apenas 'S' ou 'N'.");
-                    chose = "S";
                     break;
             }
-        } while (chose == "S");
+        }
 
+        return false;
     }
-
 }
