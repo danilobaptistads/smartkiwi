@@ -69,7 +69,7 @@ public class Queue
     {
         PriorityQueue = priorityQueue;
     }
-    public void SetPrioritie(int priority)
+    public void SetPriority(int priority)
     {
         Priority = priority;
         currentPriority = Priority;

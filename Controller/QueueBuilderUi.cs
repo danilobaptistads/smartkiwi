@@ -4,6 +4,7 @@ using SmartKiwi.Services;
 public class QueueBuilderUi
 {
     private QueueBuilder QueueBuilder;
+    private bool hasPriorityQueue= false;
     public QueueBuilderUi(QueueBuilder queueBuilder)
     {
         QueueBuilder = queueBuilder;
@@ -11,18 +12,22 @@ public class QueueBuilderUi
     public void Exec()
     {
 
-        bool process = true;
+        var process = true;
         do
         {
+            var isPriorityQueue = false;
             DisplayQueues();
 
             var queueName = ChoseName();
-
-            var isPriorityQueue = IsQueuePriority(queueName);
+            if (hasPriorityQueue == false)
+            {
+                isPriorityQueue = IsQueuePriority(queueName);
+            }
 
             if (isPriorityQueue)
             {
                 QueueBuilder.Build(queueName, isPriorityQueue);
+                hasPriorityQueue = true;
             }
             else
             {
