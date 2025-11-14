@@ -29,13 +29,17 @@ public class QueueBuilder
         }
     }
 
-    public void SearchQueuePriority()
+    public void SetPriorityQueueFirst()
     {
-        var i = 0;
+     
         Queue aux;
-        foreach (var queue in QueueList)
+        for ( var i = 0; i < QueueList.Count; i++)
         {
-            if (queue.PriorityQueue && i != 0)
+            if(QueueList[0].PriorityQueue == true)
+            {
+                break;
+            }
+            if (QueueList[i].PriorityQueue == true)
             {
                 aux = QueueList[0];
                 QueueList[0] = QueueList[i];
@@ -45,7 +49,7 @@ public class QueueBuilder
             }
         }
     }
-    public void SetPriorities()
+    public void AssignPriorityByOrder()
     {
         var basePriority = QueueList.Count;
 
