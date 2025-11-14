@@ -19,7 +19,7 @@ public class InitialUi
         Console.WriteLine("\nNenhuma fila criada, Crie a primeira.");
         Thread.Sleep(2000);
     }
-    public  int SetMaxQueueWaite()
+    public  int GetMaxQueueWaite()
     {
         var mensage = "Digite o tempo maximo de esperade uma fila";
         Console.WriteLine(mensage);
@@ -30,7 +30,7 @@ public class InitialUi
             Console.WriteLine(mensage);
 
         }
-        maxWaite = 0;
+    
         return maxWaite;
     }
 
