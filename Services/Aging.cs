@@ -37,7 +37,6 @@ public class Aging
 
     public void ResetPriority()
     {
-        Console.WriteLine("Resetando prio");
         MainQueueList[0].currentPriority = MainQueueList[0].Priority;
         System.Console.WriteLine(MainQueueList[0].currentPriority);
         for (var i = 1; i < MainQueueList.Count; i++)

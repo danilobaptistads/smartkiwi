@@ -20,7 +20,7 @@ public class App
         {
             initialUi.NotAnyQueueCreated();
             queueBuilderUi.Exec();
-            var maxWaite = initialUi.SetMaxQueueWaite();
+            var maxWaite = initialUi.GetMaxQueueWaite();
             queueController = new QueueController(queueList, maxWaite);
         }
         var checkInUi = new checkInUi(queueList);

@@ -30,30 +30,22 @@ public class QueueController
 
         var currentTime = DateTime.Now;
         var newCycle = cycleChecker.exec();
-
         if (newCycle)
         {
             aging.Exec(currentTime);
-            System.Console.WriteLine($"é um novo ciclo HassPrioritieMatch é {HassPrioritieMatch}");
             if(HassPrioritieMatch == true)
             {
                 aging.ResetPriority();
                 callCounter = 0;
-                System.Console.WriteLine($"prioridades resetadas");
             }
             HassPrioritieMatch = prioritiesMatcher.check(HassPrioritieMatch);
-            Console.WriteLine($" HassPrioritieMatch atual é {HassPrioritieMatch}");
 
 
         }
 
-        if (HassPrioritieMatch == false)
+        if (HassPrioritieMatch == true)
         {
  
-            Console.WriteLine(" chamada Comum");
-        }
-        else
-        {
             Console.WriteLine(" chamada Dinamica");
         }
 

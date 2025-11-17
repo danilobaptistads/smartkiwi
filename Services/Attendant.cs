@@ -11,6 +11,7 @@ public class Attendante
 
     public void CallNext()
     {
+        Console.Clear();
         var called = QueueController.AdvanceQueue();
         if(called == null)
         {
