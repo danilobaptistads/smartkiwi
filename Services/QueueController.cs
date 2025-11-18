@@ -49,19 +49,13 @@ public class QueueController
             Console.WriteLine(" chamada Dinamica");
         }
 
-        return GetClient(MainQueueList, currentTime);
+        return GetClient(currentTime);
 
 
     }
-    private Client GetClient(List<Queue> QueueList, DateTime currentTime)
+    private Client GetClient(DateTime currentTime)
     {
-        if (MainQueueList[0].lastCall == null)
-        {
-            foreach (var queue in MainQueueList)
-            {
-                queue.lastCall = currentTime;
-            }
-        }
+        InitializeUncalledQueues(currentTime);
         
         var queueListCount = 0;
         
@@ -86,6 +80,18 @@ public class QueueController
         return null;
     }
     
+    private void InitializeUncalledQueues(DateTime currentTime)
+    {
+        foreach(var queue in MainQueueList){
+		
+            if(queue.lastCall == null && queue.length > 0)
+            {
+                queue.lastCall = currentTime;
+            }
+        
+	}
+    }
+       
 
 
 }
