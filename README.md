@@ -101,7 +101,3 @@ dotnet run
 
 Este projeto está licenciado sob a **Licença MIT**.  
 Você é livre para usar, copiar, modificar e distribuir este software, desde que mantenha o aviso de copyright.
-
-
-- [ ] Estratégias de prioridade configuráveis  
-
