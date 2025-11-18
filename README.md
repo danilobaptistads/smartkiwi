@@ -1,6 +1,6 @@
 # 🥝 SmartKiwi  
 ### Sistema de Gerenciamento de Filas de atendimen com Interface em Console.
-O **SmartKiwi** nasceu como parte do meu aprendizado em C# e estruturas de dado, um estudo de **filas encadeadas em C#**, mas evoluiu para um sistema completo de gerenciamento de filas, com:
+O **SmartKiwi** nasceu como parte do meu aprendizado em C# e estruturas de dados, um estudo de **filas encadeadas**, mas evoluiu para um sistema completo de gerenciamento de filas, com:
 
 - Filas encadeadas manuais (`Node` → `Queue`)
 - Múltiplos serviços de lógica (Check-in, Atendimento, Construção de filas, Prioridade)
