@@ -4,16 +4,19 @@ public class Queue
 {
     private Node first;
     private Node last;
-    private int length;
-    private string Name { get; set; }
-    private int Priority { get; set; }
-    public Queue(string name, int priority)
+    public int length;
+    public int currentPriority;
+    public DateTime? lastCall = null;
+    public string Name { get; }
+    public int Priority { get; private set; }
+    public bool PriorityQueue { get; private set; }
+    public Queue(string name)
     {
         Name = name;
         last = null;
         first = null;
         length = 0;
-        Priority = priority;
+        IsPriorityQueue(false);
     }
 
     public void Enqueue(Client client)
@@ -27,6 +30,7 @@ public class Queue
             return;
         }
         first = newNode;
+        last = newNode;
         length++;
 
 
@@ -36,10 +40,10 @@ public class Queue
     {
         if (IsEmpty())
         {
-
+            System.Console.WriteLine(Name);
             throw new InvalidOperationException();
         }
-        
+
         var currentNode = first;
         first = currentNode.NextNode;
         length--;
@@ -48,15 +52,29 @@ public class Queue
         {
             last = null;
         }
-        
-        
+
+
         return currentNode.data;
     }
-    
+
+    public Client GetLastNode()
+    {
+        return last.data;
+    }
     public Boolean IsEmpty()
     {
         return length == 0;
     }
+    public void IsPriorityQueue(bool priorityQueue = true)
+    {
+        PriorityQueue = priorityQueue;
+    }
+    public void SetPriority(int priority)
+    {
+        Priority = priority;
+        currentPriority = Priority;
+    }
+
 }
 
 

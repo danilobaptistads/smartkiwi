@@ -1,0 +1,15 @@
+D:\SmartKiwi\bin\Debug\net9.0\SmartKiwi.exe
+D:\SmartKiwi\bin\Debug\net9.0\SmartKiwi.deps.json
+D:\SmartKiwi\bin\Debug\net9.0\SmartKiwi.runtimeconfig.json
+D:\SmartKiwi\bin\Debug\net9.0\SmartKiwi.dll
+D:\SmartKiwi\bin\Debug\net9.0\SmartKiwi.pdb
+D:\SmartKiwi\obj\Debug\net9.0\SmartKiwi.GeneratedMSBuildEditorConfig.editorconfig
+D:\SmartKiwi\obj\Debug\net9.0\SmartKiwi.AssemblyInfoInputs.cache
+D:\SmartKiwi\obj\Debug\net9.0\SmartKiwi.AssemblyInfo.cs
+D:\SmartKiwi\obj\Debug\net9.0\SmartKiwi.csproj.CoreCompileInputs.cache
+D:\SmartKiwi\obj\Debug\net9.0\SmartKiwi.sourcelink.json
+D:\SmartKiwi\obj\Debug\net9.0\SmartKiwi.dll
+D:\SmartKiwi\obj\Debug\net9.0\refint\SmartKiwi.dll
+D:\SmartKiwi\obj\Debug\net9.0\SmartKiwi.pdb
+D:\SmartKiwi\obj\Debug\net9.0\SmartKiwi.genruntimeconfig.cache
+D:\SmartKiwi\obj\Debug\net9.0\ref\SmartKiwi.dll
