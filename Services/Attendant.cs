@@ -25,7 +25,7 @@ public class Attendante
     public void Show(Client called)
     {
 
-        Console.WriteLine($"Senha: {called.WaiteTicket} /n Nome: {called.Name}");
+        Console.WriteLine($"Senha: {called.WaiteTicket} \nNome: {called.Name}");
 
     }
 }

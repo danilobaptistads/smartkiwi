@@ -15,7 +15,7 @@ public class AttendantUi
         System.Console.WriteLine("Fila não iniciada");
         do
         {
-            Console.WriteLine("Chamar? ( S/ N");
+            Console.WriteLine("\nChamar? ( S/ N )");
             chose = Console.ReadLine().ToLower();
             switch (chose)
             {
