@@ -1,4 +1,4 @@
-namespace SmartKiwi.Models;
+namespace SmartKiwiApp.Models;
 
 public class Client
 {
