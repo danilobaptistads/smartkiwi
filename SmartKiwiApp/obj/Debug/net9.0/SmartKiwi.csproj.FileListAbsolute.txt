@@ -1,6 +1,0 @@
-D:\SmartKiwi\obj\Debug\net9.0\SmartKiwi.csproj.AssemblyReference.cache
-D:\SmartKiwi\obj\Debug\net9.0\SmartKiwi.GeneratedMSBuildEditorConfig.editorconfig
-D:\SmartKiwi\obj\Debug\net9.0\SmartKiwi.AssemblyInfoInputs.cache
-D:\SmartKiwi\obj\Debug\net9.0\SmartKiwi.AssemblyInfo.cs
-D:\SmartKiwi\obj\Debug\net9.0\SmartKiwi.csproj.CoreCompileInputs.cache
-D:\SmartKiwi\obj\Debug\net9.0\SmartKiwi.sourcelink.json
