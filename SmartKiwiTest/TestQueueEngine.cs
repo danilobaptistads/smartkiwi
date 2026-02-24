@@ -9,8 +9,8 @@ public class TestQueueEngine
         var newQueue = new ClientQueue("TEste");
         var queueEngine = new QueueEngine();
         queueEngine.AddQueue(newQueue);
-        var lenghtQueueLista = queueEngine.QueueListLength();
-        Assert.Equal(1,lenghtQueue);
+        var lenghtQueueList = queueEngine.QueueListLength();
+        Assert.Equal(1,lenghtQueueList);
     
     }
 }
