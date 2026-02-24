@@ -1,6 +1,4 @@
-﻿using SmartKiwi.Models;
-using SmartKiwi.Services;
-using SmartKiwi.Controller;
+﻿using SmartKiwiApp.Models;
 
 
 // var queueList = new List<Queue>(); //Criando lista de filas
@@ -42,7 +40,7 @@ using SmartKiwi.Controller;
 //  atendimento.Exec();
 
 // /
-var app = new App();
+// var app = new App();
 
-app.Run();
+// app.Run();
 
