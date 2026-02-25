@@ -32,6 +32,10 @@ public class ClientQueue
         Priority = priority;
         currentPriority = Priority;
     }
+    public int Length()
+    {
+      return clientQueue.Count();
+    }
 
 }
 
