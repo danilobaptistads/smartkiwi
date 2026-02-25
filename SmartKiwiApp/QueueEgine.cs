@@ -3,15 +3,18 @@ using SmartKiwiApp.Models;
 public class QueueEngine
 {
 List<ClientQueue> queueList;
-int currentQueueIndex;
-int nextQueueIndex;
 bool isMajorQueue;
+int index;
+int nextIndex;
+int previosIndex;
+ClientQueue currentQueue;
 public QueueEngine()
     {
         queueList = new List<ClientQueue>();
-        queueList.Count();
-        currentQueueIndex = 0;
         isMajorQueue = true;
+        index = 0;
+        nextIndex = index + 1;
+        previosIndex = index - 1;
         
     }
     public void AddQueue(ClientQueue newQueue)
@@ -20,7 +23,13 @@ public QueueEngine()
     }
     public Client ProcessQueue()
     {
-        return default;
+        if(queueList[index].Length() == 0)
+        {
+            index = nextIndex;
+        }
+        
+
+        return queueList[index].Dequeue();
     }
 
     public int QueueListLength()

@@ -3,12 +3,23 @@ using SmartKiwiApp.Models;
 
 public class TestQueueEngine
 {
+    private readonly QueueEngine queueEngine;
+    private readonly ClientQueue queueA;
+    private readonly ClientQueue queueB;
+    private readonly ClientQueue queueC;
+    public TestQueueEngine()
+    {
+        queueEngine = new QueueEngine();
+        queueA = new ClientQueue("Fila_A");
+        queueB = new ClientQueue("Fila_B");
+        queueC = new ClientQueue("Fila_C");
+
+    }
+
     [Fact]
     public void Deve_Adicionar_1_Nova_Fila_A_Lista_DE_FIlas()
     {
-        var newQueue = new ClientQueue("TEste");
-        var queueEngine = new QueueEngine();
-        queueEngine.AddQueue(newQueue);
+        queueEngine.AddQueue(queueA);
         var lenghtQueueList = queueEngine.QueueListLength();
         Assert.Equal(1,lenghtQueueList);
     
@@ -17,12 +28,9 @@ public class TestQueueEngine
     [Fact]
     public void Deve_Chamar_Fila_B_Se_Fila_A_Esvaziar()
     {
-        var newQueueA = new ClientQueue("A");
-        var newQueueB = new ClientQueue("B");
-        newQueueB.Enqueue(new Client("Client_B",1));
-        var queueEngine = new QueueEngine();
-        queueEngine.AddQueue(newQueueA);
-        queueEngine.AddQueue(newQueueB);
+        queueB.Enqueue(new Client("Client_B",1));
+        queueEngine.AddQueue(queueA);
+        queueEngine.AddQueue(queueB);
 
         var clientCalLed = queueEngine.ProcessQueue();
         
