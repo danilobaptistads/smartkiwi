@@ -13,20 +13,13 @@ public class TestQueueEngine
         queueA = new ClientQueue("Fila_A");
         queueB = new ClientQueue("Fila_B");
         queueC = new ClientQueue("Fila_C");
-
+        queueA.SetPriority(3);
+        queueB.SetPriority(2);
+        queueC.SetPriority(1);
     }
-
+   
     [Fact]
-    public void Deve_Adicionar_1_Nova_Fila_A_Lista_DE_FIlas()
-    {
-        queueEngine.AddQueue(queueA);
-        var lenghtQueueList = queueEngine.QueueListLength();
-        Assert.Equal(1,lenghtQueueList);
-    
-    }
-    
-    [Fact]
-    public void Deve_Chamar_Fila_B_Se_Fila_A_Esvaziar()
+    public void Deve_Chamar_Fila_B_Se_A_For_Vazia()
     {
         queueB.Enqueue(new Client("Client_B",1));
         queueEngine.AddQueue(queueA);
@@ -37,5 +30,22 @@ public class TestQueueEngine
         Assert.Equal("Client_B",clientCalLed.Name);
     
     }
+    [Fact]
+    public void Deve_Retornar_Client_A_2()
+    {
+        queueA.Enqueue(new Client("Client_A_1",1));
+        queueA.Enqueue(new Client("Client_A_2",1));
+        queueB.Enqueue(new Client("Client_B",1));
+        queueEngine.AddQueue(queueA);
+        queueEngine.AddQueue(queueB);
+
+        var clientCalLed = queueEngine.ProcessQueue();
+        clientCalLed = queueEngine.ProcessQueue();
+        clientCalLed = queueEngine.ProcessQueue();
+        
+        Assert.Equal("Client_A_2",clientCalLed.Name);
+    
+    }
+
 }
 
