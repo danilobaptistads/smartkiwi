@@ -30,6 +30,20 @@ public class TestQueueEngine
         Assert.Equal("Client_B",clientCalLed.Name);
     
     }
+        [Fact]
+        public void Deve_Chamar_Fila_B_Se_CureentPriority_A_For_0()
+    {   
+        queueA.currentPriority = 0;
+        queueA.Enqueue(new Client("Client_A_1",1));
+        queueB.Enqueue(new Client("Client_B_1",1));
+        queueEngine.AddQueue(queueA);
+        queueEngine.AddQueue(queueB);
+
+        var clientCalLed = queueEngine.ProcessQueue();
+        
+        Assert.Equal("Client_B_1",clientCalLed.Name);
+    
+    }
     [Fact]
     public void Deve_Retornar_Client_A_2()
     {
