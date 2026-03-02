@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using SmartKiwiApp.Models;
 
 public class QueueEngine
@@ -34,47 +35,21 @@ public QueueEngine()
 
         if(currentQueue.Length() == 0 || currentQueue.currentPriority == 0)
         {
-            index = GetNextIndex();
-            currentQueue = queueList[index];
-            
+            UpdateQueueToNextCall();
+            UpdateMajorQueueState();
+        
         }
         
         var Client = currentQueue.Dequeue();
         currentQueue.currentPriority--;
         callsCount++;
 
-        if(isMajorQueue)
-        {
-            index = GetNextIndex();
-            currentQueue = queueList[index];
-            isMajorQueue = false;
-        }
-        else
-        {
-            index = GetPreviusIndex();
-            currentQueue = queueList[index];
-            isMajorQueue = true;
-        }
+        UpdateQueueToNextCall();
+        UpdateMajorQueueState();
 
         return Client;
 
         
-    }
-    internal int GetNextIndex()
-    {
-        if(index < (queueList.Count - 1))
-        {
-            index++;
-        }
-        return index;
-    }
-    internal int GetPreviusIndex()
-    {
-        if(index > 0)
-        {
-            index--;
-        }
-        return index;
     }
     internal int SumOfPrioritys()
     {
@@ -90,6 +65,36 @@ public QueueEngine()
         foreach(ClientQueue queue in queueList)
         {
             queue.currentPriority = queue.Priority;
+        }
+    }
+    internal void UpdateQueueToNextCall()
+    {
+        if(isMajorQueue)
+        {
+            if(index < (queueList.Count - 1))
+            {
+                index++;
+            }
+            currentQueue = queueList[index];
+        }
+        else
+        {
+            if(index > 0)
+            {
+                index--;
+            }
+            currentQueue = queueList[index];
+        }
+    }
+    internal void UpdateMajorQueueState()
+    {
+        if(isMajorQueue)
+        {
+            isMajorQueue = false;
+        }
+        else
+        {
+            isMajorQueue = true;
         }
     }
 }
