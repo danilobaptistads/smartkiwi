@@ -4,53 +4,67 @@ using SmartKiwiApp.Models;
 public class QueueEngine
 {
 List<ClientQueue> queueList;
+List<ClientQueue> queuesToCall;
 bool isMajorQueue;
 int index;
 int callsCount;
-int sumPriotitys;
+int sumOfPriotitys;
 ClientQueue currentQueue;
 public QueueEngine()
     {
         queueList = new List<ClientQueue>();
+        queuesToCall = new List<ClientQueue>();
         isMajorQueue = true;
         index = 0;
         callsCount = 0;
-
 
     }
     public void AddQueue(ClientQueue newQueue)
     {
         queueList.Add(newQueue);
-        sumPriotitys = SumOfPrioritys();
+        sumOfPriotitys = SumOfPrioritys();
         
     }
+    
     public Client ProcessQueue()
     {
-        currentQueue = queueList[index];
-        if(callsCount >= sumPriotitys)
+        var emptyQueue = 0;
+
+        if (queuesToCall.Count == 0 || callsCount >= sumOfPriotitys)
         {
+            queuesToCall = new List<ClientQueue>(queueList);
             resetCurrentPrioritys();
+            callsCount = 0;
             isMajorQueue = true;
+            index = 0;
         }
 
-        if(currentQueue.Length() == 0 || currentQueue.currentPriority == 0)
+        while (emptyQueue < queuesToCall.Count && queuesToCall.Count > 0)
         {
-            UpdateQueueToNextCall();
-            UpdateMajorQueueState();
-        
+            currentQueue = queuesToCall[index];
+
+            if (currentQueue.Length() == 0 || currentQueue.currentPriority == 0)
+            {
+                queuesToCall.RemoveAt(index);
+                emptyQueue++;
+                continue;
+            }
+
+            break;
         }
-        
-        var Client = currentQueue.Dequeue();
+
+        currentQueue = queuesToCall[index];
+
+        var client = currentQueue.Dequeue();
         currentQueue.currentPriority--;
         callsCount++;
 
         UpdateQueueToNextCall();
         UpdateMajorQueueState();
 
-        return Client;
-
-        
+        return client;
     }
+
     internal int SumOfPrioritys()
     {
         var sum = 0;
@@ -71,11 +85,10 @@ public QueueEngine()
     {
         if(isMajorQueue)
         {
-            if(index < (queueList.Count - 1))
+            if(index < (queuesToCall.Count - 1))
             {
                 index++;
             }
-            currentQueue = queueList[index];
         }
         else
         {
@@ -83,7 +96,6 @@ public QueueEngine()
             {
                 index--;
             }
-            currentQueue = queueList[index];
         }
     }
     internal void UpdateMajorQueueState()
