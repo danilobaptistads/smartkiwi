@@ -84,5 +84,12 @@ public class TestQueueEngine
     
     }
 
+    [Fact]
+    public void Deve_Retornar_Null_Se_Não_Hover_Clients_Em_Nenhuma_Fila()
+    {
+        var clientCalLed = queueEngine.ProcessQueue();
+        Assert.Null(clientCalLed);
+        
+    }
 }
 
