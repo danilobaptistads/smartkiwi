@@ -52,7 +52,10 @@ public QueueEngine()
 
             break;
         }
-
+        if(queuesToCall.Count == 0)
+        {
+            return null;
+        }
         currentQueue = queuesToCall[index];
 
         var client = currentQueue.Dequeue();
