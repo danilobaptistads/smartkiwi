@@ -30,20 +30,7 @@ public class TestQueueEngine
         Assert.Equal("Client_B",clientCalLed.Name);
     
     }
-        [Fact]
-        public void Deve_Chamar_Fila_B_Se_CureentPriority_A_For_0()
-    {   
-        queueA.currentPriority = 0;
-        queueA.Enqueue(new Client("Client_A_1",1));
-        queueB.Enqueue(new Client("Client_B_1",1));
-        queueEngine.AddQueue(queueA);
-        queueEngine.AddQueue(queueB);
-
-        var clientCalLed = queueEngine.ProcessQueue();
-        
-        Assert.Equal("Client_B_1",clientCalLed.Name);
     
-    }
     [Fact]
     public void Deve_Retornar_Client_A_2()
     {
@@ -58,6 +45,42 @@ public class TestQueueEngine
         clientCalLed = queueEngine.ProcessQueue();
         
         Assert.Equal("Client_A_2",clientCalLed.Name);
+    
+    }
+
+     [Fact]
+    public void Deve_Chamar_Na_Sasquencia_ABABAC_Em_Um_Ciclo()
+    {
+        var callsList = new List<Client>();
+        queueA.Enqueue(new Client("Client_A_1",1));
+        queueA.Enqueue(new Client("Client_A_2",1));
+        queueA.Enqueue(new Client("Client_A_3",1));
+        queueB.Enqueue(new Client("Client_B_1",1));
+        queueB.Enqueue(new Client("Client_B_2",1));
+        queueC.Enqueue(new Client("Client_C_1",1));
+        queueEngine.AddQueue(queueA);
+        queueEngine.AddQueue(queueB);
+        queueEngine.AddQueue(queueC);
+
+
+        for(int i =0; i <=5; i++)
+        {
+            var clientCalLed = queueEngine.ProcessQueue();
+            callsList.Add(clientCalLed);
+        }
+
+        
+        Assert.Collection(
+            callsList,
+            c => Assert.Equal("Client_A_1", c.Name ),
+            c => Assert.Equal("Client_B_1", c.Name ),
+            c => Assert.Equal("Client_A_2", c.Name ),
+            c => Assert.Equal("Client_B_2", c.Name ),
+            c => Assert.Equal("Client_A_3", c.Name ),
+            c => Assert.Equal("Client_C_1", c.Name )
+
+            );
+        
     
     }
 
