@@ -3,22 +3,19 @@ public class ClientQueue
 {
     private Queue<Client> clientQueue;
     public string Name { get; }
-    public DateTime? lastCall = null;
     public int Priority { get; private set; }
     public int currentPriority;
-    public bool IsPriorityQueue { get; private set; }
+    public bool isLastCalled;
+    public DateTime? lastCallTime = null;
     
     public ClientQueue(string name)
     {
         Name = name;
         clientQueue = new Queue<Client>();
-        IsPriorityQueue = false;
+        isLastCalled = false;
+      
     }
 
-    public void MakeAsPriorityQueue ()
-    {
-        IsPriorityQueue = true;
-    }
     public void Enqueue(Client client)
     {
        clientQueue.Enqueue(client);
@@ -32,9 +29,13 @@ public class ClientQueue
         Priority = priority;
         currentPriority = Priority;
     }
-    public int Length()
+    public bool IsEmpty()
     {
-      return clientQueue.Count();
+        if(clientQueue.Count() > 0)
+        {
+            return false;
+        }
+        return true;
     }
 
 }
