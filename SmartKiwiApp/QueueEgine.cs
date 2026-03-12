@@ -1,11 +1,8 @@
-using System.Security.Cryptography;
 using SmartKiwiApp.Models;
 
 public class QueueEngine
 {
 List<ClientQueue> queueList;
-List<ClientQueue> queuesToCall;
-bool isMajorQueue;
 int index;
 int callsCount;
 int sumOfPriotitys;
@@ -13,9 +10,6 @@ ClientQueue currentQueue;
 public QueueEngine()
     {
         queueList = new List<ClientQueue>();
-        queuesToCall = new List<ClientQueue>();
-        isMajorQueue = true;
-        index = 0;
         callsCount = 0;
 
     }
@@ -28,44 +22,36 @@ public QueueEngine()
     
     public Client ProcessQueue()
     {
-        var emptyQueue = 0;
-
-        if (queuesToCall.Count == 0 || callsCount >= sumOfPriotitys)
+        Client client;
+        if(callsCount >= sumOfPriotitys)
         {
-            queuesToCall = new List<ClientQueue>(queueList);
             resetCurrentPrioritys();
+            ResetLastCalledState();
             callsCount = 0;
-            isMajorQueue = true;
-            index = 0;
+            
+        
+
         }
-
-        while (emptyQueue < queuesToCall.Count && queuesToCall.Count > 0)
+        var activeQueues = ActiveQueuesTotal();
+        foreach(ClientQueue queue in queueList)
         {
-            currentQueue = queuesToCall[index];
-
-            if (currentQueue.Length() == 0 || currentQueue.currentPriority == 0)
+            
+            if( !queue.IsEmpty() && queue.currentPriority > 0 && (!queue.isLastCalled || ActiveQueuesTotal() == 1))
             {
-                queuesToCall.RemoveAt(index);
-                emptyQueue++;
-                continue;
+
+                client = queue.Dequeue();
+                ChangeLastCalledState(queue);
+                callsCount++;
+                queue.currentPriority--;
+                return client;
+                
             }
+            
 
-            break;
         }
-        if(queuesToCall.Count == 0)
-        {
-            return null;
-        }
-        currentQueue = queuesToCall[index];
+        
+        return null;
 
-        var client = currentQueue.Dequeue();
-        currentQueue.currentPriority--;
-        callsCount++;
-
-        UpdateQueueToNextCall();
-        UpdateMajorQueueState();
-
-        return client;
     }
 
     internal int SumOfPrioritys()
@@ -84,32 +70,43 @@ public QueueEngine()
             queue.currentPriority = queue.Priority;
         }
     }
-    internal void UpdateQueueToNextCall()
+
+    internal void ResetLastCalledState()
     {
-        if(isMajorQueue)
+        foreach (ClientQueue queue in queueList)
         {
-            if(index < (queuesToCall.Count - 1))
-            {
-                index++;
-            }
-        }
-        else
-        {
-            if(index > 0)
-            {
-                index--;
-            }
+            queue.isLastCalled = false;
         }
     }
-    internal void UpdateMajorQueueState()
+
+    internal void ChangeLastCalledState(ClientQueue currentQueue)
     {
-        if(isMajorQueue)
+        foreach (ClientQueue queue in queueList)
         {
-            isMajorQueue = false;
+            if(currentQueue.Name == queue.Name)
+            {
+                currentQueue.isLastCalled = true;
+                continue;
+            }
+            if(queue.isLastCalled)
+            {
+                queue.isLastCalled = false;
+            }
+
         }
-        else
+    }
+
+    internal int ActiveQueuesTotal()
+    {   
+        var total =0;
+        foreach(var queue in queueList)
         {
-            isMajorQueue = true;
+            if(!queue.IsEmpty() && queue.currentPriority > 0)
+            {
+                total++;
+            }
+            
         }
+        return total;
     }
 }
