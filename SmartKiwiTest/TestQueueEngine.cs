@@ -131,5 +131,43 @@ public class TestQueueEngine
 
     }
 
-}
+    [Theory]
+    [InlineData(true,false,false, new[]{"Client_B_1","Client_C_1","Client_B_2"})]
+    [InlineData(false,true,false, new[]{"Client_A_1","Client_C_1","Client_A_2","Client_A_3"})]
+    [InlineData(false,false,true, new[]{"Client_A_1","Client_B_1","Client_A_2","Client_B_2","Client_A_3"})]
+    public void Deve_Chamar_Mesmo_Com_Uma_Fila_Vazia(bool aIsEmpty, bool bIsEmpty,bool cIsEmpty, string[] expected)
+    {
+    if (!aIsEmpty)
+    {
+        queueA.Enqueue(new Client("Client_A_1", 1));
+        queueA.Enqueue(new Client("Client_A_2", 1));
+        queueA.Enqueue(new Client("Client_A_3", 1));
+    }
 
+    if (!bIsEmpty)
+    {
+        queueB.Enqueue(new Client("Client_B_1", 1));
+        queueB.Enqueue(new Client("Client_B_2", 1));
+    }
+
+    if (!cIsEmpty)
+    {
+        queueC.Enqueue(new Client("Client_C_1", 1));
+    }
+
+    var callsList = new List<string>();
+
+    queueEngine.AddQueue(queueA);
+    queueEngine.AddQueue(queueB);
+    queueEngine.AddQueue(queueC);
+
+    Client clientCalLed;
+
+    while ((clientCalLed = queueEngine.ProcessQueue()) != null)
+    {
+        callsList.Add(clientCalLed.Name);
+    }
+
+    Assert.Equal(expected, callsList);
+}
+}
