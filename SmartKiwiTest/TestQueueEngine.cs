@@ -11,9 +11,9 @@ public class TestQueueEngine
     public TestQueueEngine()
     {
         queueEngine = new QueueEngine();
-        queueA = new ClientQueue("Fila_A");
-        queueB = new ClientQueue("Fila_B");
-        queueC = new ClientQueue("Fila_C");
+        queueA = new ClientQueue("A");
+        queueB = new ClientQueue("B");
+        queueC = new ClientQueue("C");
         queueA.SetPriority(3);
         queueB.SetPriority(2);
         queueC.SetPriority(1);
@@ -26,31 +26,16 @@ public class TestQueueEngine
         queueEngine.AddQueue(queueA);
         queueEngine.AddQueue(queueB);
 
-        var clientCalLed = queueEngine.ProcessQueue();
+        var QueueCalLed = queueEngine.ProcessQueue();
 
-        Assert.Equal("Client_B", clientCalLed.Name);
-
-    }
-    [Fact]
-    public void Deve_Retornar_Client_A_2()
-    {
-        queueA.Enqueue(new Client("Client_A_1", 1));
-        queueA.Enqueue(new Client("Client_A_2", 1));
-        queueB.Enqueue(new Client("Client_B", 1));
-        queueEngine.AddQueue(queueA);
-        queueEngine.AddQueue(queueB);
-
-        var clientCalLed = queueEngine.ProcessQueue();
-        clientCalLed = queueEngine.ProcessQueue();
-        clientCalLed = queueEngine.ProcessQueue();
-
-        Assert.Equal("Client_A_2", clientCalLed.Name);
+        Assert.Same(queueB, QueueCalLed);
 
     }
+
     [Fact]
     public void Deve_Chamar_Na_Sasquencia_ABABAC_Em_Um_Ciclo()
     {
-        var callsList = new List<Client>();
+        var callsList = new List<ClientQueue>();
         queueA.Enqueue(new Client("Client_A_1", 1));
         queueA.Enqueue(new Client("Client_A_2", 1));
         queueA.Enqueue(new Client("Client_A_3", 1));
@@ -63,25 +48,25 @@ public class TestQueueEngine
 
         for (int i = 0; i < 6; i++)
         {
-            var clientCalLed = queueEngine.ProcessQueue();
-            callsList.Add(clientCalLed);
+            var queuCalled = queueEngine.ProcessQueue();
+            callsList.Add(queuCalled);
         }
 
         Assert.Collection(
             callsList,
-            c => Assert.Equal("Client_A_1", c.Name),
-            c => Assert.Equal("Client_B_1", c.Name),
-            c => Assert.Equal("Client_A_2", c.Name),
-            c => Assert.Equal("Client_B_2", c.Name),
-            c => Assert.Equal("Client_A_3", c.Name),
-            c => Assert.Equal("Client_C_1", c.Name)
+            q => Assert.Same(queueA, q),
+            q => Assert.Same(queueB, q),
+            q => Assert.Same(queueA, q),
+            q => Assert.Same(queueB, q),
+            q => Assert.Same(queueA, q),
+            q => Assert.Same(queueC, q)
 
             );
     }
     [Fact]
     public void Deve_Chamar_Na_Sasquencia_ABABACABABAC_Em_2_Ciclos()
     {
-        var callsList = new List<Client>();
+        var callsList = new List<ClientQueue>();
         queueA.Enqueue(new Client("Client_A_1", 1));
         queueA.Enqueue(new Client("Client_A_2", 1));
         queueA.Enqueue(new Client("Client_A_3", 1));
@@ -100,24 +85,24 @@ public class TestQueueEngine
 
         for (int i = 0; i < 12; i++)
         {
-            var clientCalLed = queueEngine.ProcessQueue();
-            callsList.Add(clientCalLed);
+            var QueueCalLed = queueEngine.ProcessQueue();
+            callsList.Add(QueueCalLed);
         }
 
         Assert.Collection(
             callsList,
-            c => Assert.Equal("Client_A_1", c.Name),
-            c => Assert.Equal("Client_B_1", c.Name),
-            c => Assert.Equal("Client_A_2", c.Name),
-            c => Assert.Equal("Client_B_2", c.Name),
-            c => Assert.Equal("Client_A_3", c.Name),
-            c => Assert.Equal("Client_C_1", c.Name),
-            c => Assert.Equal("Client_A_4", c.Name),
-            c => Assert.Equal("Client_B_3", c.Name),
-            c => Assert.Equal("Client_A_5", c.Name),
-            c => Assert.Equal("Client_B_4", c.Name),
-            c => Assert.Equal("Client_A_6", c.Name),
-            c => Assert.Equal("Client_C_2", c.Name)
+            q => Assert.Same(queueA, q),
+            q => Assert.Same(queueB, q),
+            q => Assert.Same(queueA, q),
+            q => Assert.Same(queueB, q),
+            q => Assert.Same(queueA, q),
+            q => Assert.Same(queueC, q),
+            q => Assert.Same(queueA, q),
+            q => Assert.Same(queueB, q),
+            q => Assert.Same(queueA, q),
+            q => Assert.Same(queueB, q),
+            q => Assert.Same(queueA, q),
+            q => Assert.Same(queueC, q)
 
             );
 
@@ -126,15 +111,15 @@ public class TestQueueEngine
     [Fact]
     public void Deve_Retornar_Null_Se_Não_Hover_Clients_Em_Nenhuma_Fila()
     {
-        var clientCalLed = queueEngine.ProcessQueue();
-        Assert.Null(clientCalLed);
+        var queueCalled = queueEngine.ProcessQueue();
+        Assert.Null(queueCalled);
 
     }
 
     [Theory]
-    [InlineData(true,false,false, new[]{"Client_B_1","Client_C_1","Client_B_2"})]
-    [InlineData(false,true,false, new[]{"Client_A_1","Client_C_1","Client_A_2","Client_A_3"})]
-    [InlineData(false,false,true, new[]{"Client_A_1","Client_B_1","Client_A_2","Client_B_2","Client_A_3"})]
+    [InlineData(true,false,false, new[]{"B","C","B"})]
+    [InlineData(false,true,false, new[]{"A","C","A","A"})]
+    [InlineData(false,false,true, new[]{"A","B","A","B","A"})]
     public void Deve_Chamar_Mesmo_Com_Uma_Fila_Vazia(bool aIsEmpty, bool bIsEmpty,bool cIsEmpty, string[] expected)
     {
     if (!aIsEmpty)
@@ -161,11 +146,11 @@ public class TestQueueEngine
     queueEngine.AddQueue(queueB);
     queueEngine.AddQueue(queueC);
 
-    Client clientCalLed;
+    ClientQueue queueCalled;
 
-    while ((clientCalLed = queueEngine.ProcessQueue()) != null)
+    while ((queueCalled = queueEngine.ProcessQueue()) != null)
     {
-        callsList.Add(clientCalLed.Name);
+        callsList.Add(queueCalled.Name);
     }
 
     Assert.Equal(expected, callsList);
