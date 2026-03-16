@@ -3,7 +3,6 @@ using SmartKiwiApp.Models;
 public class QueueEngine
 {
     List<ClientQueue> queueList;
-    int index;
     int callsCount;
     int sumOfPriotitys;
     ClientQueue lastProcessedQueue;
@@ -19,12 +18,12 @@ public class QueueEngine
         sumOfPriotitys = SumOfPrioritys();
         
     }
-    public Client ProcessQueue()
+    public ClientQueue ProcessQueue()
     {
         Client client;
         if(callsCount >= sumOfPriotitys)
         {
-            
+
             resetCurrentPrioritys();
             callsCount = 0;
 
@@ -36,11 +35,10 @@ public class QueueEngine
             if( !queue.IsEmpty() && queue.currentPriority > 0 && (queue != lastProcessedQueue || activeQueues == 1))
             {
 
-                client = queue.Dequeue();
                 callsCount++;
                 queue.currentPriority--;
                 lastProcessedQueue = queue;
-                return client;
+                return queue;
                 
             }
             
