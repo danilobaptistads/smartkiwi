@@ -5,14 +5,12 @@ public class ClientQueue
     public string Name { get; }
     public int Priority { get; private set; }
     public int currentPriority;
-    public bool isLastCalled;
     public DateTime lastCallTime;
     
     public ClientQueue(string name)
     {
         Name = name;
         clientQueue = new Queue<Client>();
-        isLastCalled = false;
         lastCallTime = DateTime.MinValue;
       
     }
