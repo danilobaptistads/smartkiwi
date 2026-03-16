@@ -3,13 +3,13 @@ using SmartKiwiApp.Models;
 public class QueueEngine
 {
     List<ClientQueue> queueList;
-    int callsCount;
+    int sucessfulProcessedQueues;
     int sumOfPriotitys;
     ClientQueue lastProcessedQueue;
     public QueueEngine()
     {
         queueList = new List<ClientQueue>();
-        callsCount = 0;
+        sucessfulProcessedQueues = 0;
 
     }
     public void AddQueue(ClientQueue newQueue)
@@ -20,24 +20,22 @@ public class QueueEngine
     }
     public ClientQueue ProcessQueue()
     {
-        Client client;
-        if(callsCount >= sumOfPriotitys)
+
+        if(sucessfulProcessedQueues >= sumOfPriotitys)
         {
 
             resetCurrentPrioritys();
-            callsCount = 0;
+            sucessfulProcessedQueues = 0;
 
         }
         var activeQueues = ActiveQueuesTotal();
         foreach(ClientQueue queue in queueList)
         {
             
-            if( !queue.IsEmpty() && queue.currentPriority > 0 && (queue != lastProcessedQueue || activeQueues == 1))
+            if( IsQualificadQueue(queue, activeQueues))
             {
 
-                callsCount++;
-                queue.currentPriority--;
-                lastProcessedQueue = queue;
+                UpdatesToNextProcess(queue);
                 return queue;
                 
             }
@@ -76,5 +74,19 @@ public class QueueEngine
             
         }
         return total;
+    }
+    internal bool IsQualificadQueue(ClientQueue queue, int activeQueues)
+    {
+        if( !queue.IsEmpty() && queue.currentPriority > 0 && (queue != lastProcessedQueue || activeQueues == 1))
+        {
+            return true;
+        }
+        return false;
+    }
+    internal void UpdatesToNextProcess(ClientQueue queue)
+    {
+        sucessfulProcessedQueues++;
+        queue.currentPriority--;
+        lastProcessedQueue = queue;
     }
 }
