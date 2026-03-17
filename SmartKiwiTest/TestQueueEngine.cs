@@ -10,7 +10,7 @@ public class TestQueueEngine
     private readonly ClientQueue queueC;
     public TestQueueEngine()
     {
-        queueEngine = new QueueEngine();
+        queueEngine = new QueueEngine(10);
         queueA = new ClientQueue("A");
         queueB = new ClientQueue("B");
         queueC = new ClientQueue("C");
@@ -25,13 +25,13 @@ public class TestQueueEngine
         queueB.Enqueue(new Client("Client_B", 1));
         queueEngine.AddQueue(queueA);
         queueEngine.AddQueue(queueB);
+        queueEngine. InicializeLastcallTime();
 
         var QueueCalLed = queueEngine.ProcessQueue();
 
         Assert.Same(queueB, QueueCalLed);
 
     }
-
     [Fact]
     public void Deve_Chamar_Na_Sasquencia_ABABAC_Em_Um_Ciclo()
     {
@@ -45,6 +45,7 @@ public class TestQueueEngine
         queueEngine.AddQueue(queueA);
         queueEngine.AddQueue(queueB);
         queueEngine.AddQueue(queueC);
+        queueEngine. InicializeLastcallTime();
 
         for (int i = 0; i < 6; i++)
         {
@@ -82,6 +83,7 @@ public class TestQueueEngine
         queueEngine.AddQueue(queueA);
         queueEngine.AddQueue(queueB);
         queueEngine.AddQueue(queueC);
+        queueEngine. InicializeLastcallTime();
 
         for (int i = 0; i < 12; i++)
         {
@@ -145,6 +147,7 @@ public class TestQueueEngine
     queueEngine.AddQueue(queueA);
     queueEngine.AddQueue(queueB);
     queueEngine.AddQueue(queueC);
+    queueEngine. InicializeLastcallTime();
 
     ClientQueue queueCalled;
 
@@ -155,4 +158,41 @@ public class TestQueueEngine
 
     Assert.Equal(expected, callsList);
 }
+
+[Theory]
+[InlineData(true,false,false,"A")]
+[InlineData(false,true,false,"B")]
+[InlineData(false,false,true,"C")]
+public void Deve_retornar_Fila_Em_TimeOut(bool aInTimeout, bool bInTimeout,bool cInTimeout, string expectedQueue)
+    {
+        queueEngine.AddQueue(queueA);
+        queueEngine.AddQueue(queueB);
+        queueEngine.AddQueue(queueC);
+        queueEngine.InicializeLastcallTime();
+        queueA.Enqueue(new Client("Client_A_1", 1));
+        queueB.Enqueue(new Client("Client_B_1", 1));
+        queueC.Enqueue(new Client("Client_C_1", 1));
+
+        var timeLapsedTenMinutes = DateTime.Now.AddMinutes(-11);
+        if (aInTimeout)
+        {
+            queueA.lastCallTime = timeLapsedTenMinutes;
+        }
+
+        if (bInTimeout)
+        {
+            queueB.lastCallTime = timeLapsedTenMinutes;
+        }
+
+        if (cInTimeout)
+        {
+            queueC.lastCallTime = timeLapsedTenMinutes;
+        }
+        
+
+        var result = queueEngine.ProcessQueue();
+
+        Assert.Equal(expectedQueue, result.Name);
+        
+    }
 }
