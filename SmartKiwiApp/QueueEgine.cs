@@ -1,15 +1,18 @@
+using System.Collections;
 using SmartKiwiApp.Models;
 
 public class QueueEngine
 {
     List<ClientQueue> queueList;
-    int sucessfulProcessedQueues;
+    int successfullyProcessedQueues;
     int sumOfPriotitys;
     ClientQueue lastProcessedQueue;
-    public QueueEngine()
+    public int MaxWaiteMinutes { get; set; }
+    public QueueEngine(int maxWaiteMinutes)
     {
         queueList = new List<ClientQueue>();
-        sucessfulProcessedQueues = 0;
+        successfullyProcessedQueues = 0;
+        MaxWaiteMinutes = maxWaiteMinutes;
 
     }
     public void AddQueue(ClientQueue newQueue)
@@ -21,30 +24,34 @@ public class QueueEngine
     public ClientQueue ProcessQueue()
     {
 
-        if(sucessfulProcessedQueues >= sumOfPriotitys)
+        if(successfullyProcessedQueues >= sumOfPriotitys)
         {
 
             resetCurrentPrioritys();
-            sucessfulProcessedQueues = 0;
+            successfullyProcessedQueues = 0;
 
         }
         var activeQueues = ActiveQueuesTotal();
+        var queueInTimeout = HasQueueInTimeout();
+        if ( queueInTimeout != null)
+        {
+
+                UpdatesToNextProcess(queueInTimeout);
+                return queueInTimeout;
+                
+        
+        }
         foreach(ClientQueue queue in queueList)
         {
-            
-            if( IsQualificadQueue(queue, activeQueues))
+            if( !queue.IsEmpty() && queue.currentPriority > 0 && (queue != lastProcessedQueue || activeQueues == 1))
             {
 
                 UpdatesToNextProcess(queue);
                 return queue;
-                
             }
-            
-
         }
-        
+    
         return null;
-
     }
     internal int SumOfPrioritys()
     {
@@ -75,18 +82,37 @@ public class QueueEngine
         }
         return total;
     }
-    internal bool IsQualificadQueue(ClientQueue queue, int activeQueues)
-    {
-        if( !queue.IsEmpty() && queue.currentPriority > 0 && (queue != lastProcessedQueue || activeQueues == 1))
-        {
-            return true;
-        }
-        return false;
-    }
     internal void UpdatesToNextProcess(ClientQueue queue)
     {
-        sucessfulProcessedQueues++;
+        successfullyProcessedQueues++;
         queue.currentPriority--;
         lastProcessedQueue = queue;
+        queue.lastCallTime = DateTime.Now;
+    }
+    internal ClientQueue HasQueueInTimeout()
+    {
+        foreach(ClientQueue queue in queueList)
+        {
+
+            if (queue.IsEmpty())
+            {
+                continue;
+            } 
+            var timeSinceLastCall = DateTime.Now - queue.lastCallTime;
+            if(timeSinceLastCall.TotalMinutes >= MaxWaiteMinutes)
+            {
+                return queue;
+                
+            }
+        }
+        return null;
+    }
+     public void InicializeLastcallTime()
+    {
+        var initialTime = DateTime.Now;
+        foreach( ClientQueue queue in queueList)
+        {
+            queue.lastCallTime = initialTime;
+        }
     }
 }
