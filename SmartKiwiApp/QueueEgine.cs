@@ -21,7 +21,21 @@ public class QueueEngine
         sumOfPriotitys = SumOfPrioritys();
         
     }
-    public ClientQueue ProcessQueue()
+    
+    public Client ProcessClient()
+    {
+        var currentQueue = SelectNextQueue();
+        if(currentQueue != null && !currentQueue.IsEmpty())
+        {
+            var client = currentQueue.Dequeue();
+            UpdateQueueForNextCall(currentQueue);
+            return client;
+        }
+        
+        return null;
+
+    }
+    public ClientQueue SelectNextQueue()
     {
 
         if(successfullyProcessedQueues >= sumOfPriotitys)
@@ -33,29 +47,26 @@ public class QueueEngine
         }
         var activeQueues = ActiveQueuesTotal();
         var queueInTimeout = HasQueueInTimeout();
+
         if ( queueInTimeout != null)
         {
-
-                UpdatesToNextProcess(queueInTimeout);
                 return queueInTimeout;
-                
-        
         }
+
         foreach(ClientQueue queue in queueList)
         {
+
             if( !queue.IsEmpty() && queue.currentPriority > 0 && (queue != lastProcessedQueue || activeQueues == 1))
             {
-
-                UpdatesToNextProcess(queue);
                 return queue;
             }
         }
-    
         return null;
     }
     internal int SumOfPrioritys()
     {
         var sum = 0;
+        
         foreach(ClientQueue queue in queueList)
         {
             sum += queue.Priority;
@@ -82,7 +93,7 @@ public class QueueEngine
         }
         return total;
     }
-    internal void UpdatesToNextProcess(ClientQueue queue)
+    internal void UpdateQueueForNextCall(ClientQueue queue)
     {
         successfullyProcessedQueues++;
         queue.currentPriority--;
