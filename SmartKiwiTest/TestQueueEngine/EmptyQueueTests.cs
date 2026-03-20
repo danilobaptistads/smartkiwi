@@ -93,4 +93,52 @@ public class EmptyQueueTests
     Assert.Equal(expected, callsList);
 }
 
+    [Theory]
+    [InlineData(true,false,false, new[]{"Null_Aqui","A_1"})]
+    [InlineData(false,true,false, new[]{"Null_Aqui","B_1"})]
+    [InlineData(false,false,true, new[]{"Null_Aqui","C_1"})]
+    public void Deve_Chamar_O_Cliente_Ao_Adicionar_Em_Fila_Vazia(bool addInA, bool addInB,bool AddInC, string[] expected)
+    {
+        
+        Client clientCalled;
+        queueEngine.AddQueue(queueA);
+        queueEngine.AddQueue(queueB);
+        queueEngine.AddQueue(queueC);
+        var callsList = new List<string>();
+        queueEngine. InicializeLastcallTime();
+
+        clientCalled = queueEngine.ProcessClient();
+        if (clientCalled == null)
+        {
+            callsList.Add("Null_Aqui");
+        }
+        else
+        {
+            callsList.Add(clientCalled.Name);
+        }
+       
+
+        if (addInA)
+        {
+            queueA.Enqueue(new Client("A_1", 1));
+            
+        }
+
+        if (addInB)
+        {
+            queueB.Enqueue(new Client("B_1", 1));
+    
+        }
+
+        if (AddInC)
+        {
+            queueC.Enqueue(new Client("C_1", 1));
+        }
+        
+        clientCalled = queueEngine.ProcessClient();
+        callsList.Add(clientCalled.Name);
+
+        Assert.Equal(expected, callsList);
+    }
+
 }
