@@ -94,4 +94,48 @@ public class SequenceTests
             );
    }
     
+    [Fact]
+    public void Deve_Chamar_Uma_vez_Cada_Quando_Prioridades_Iguais()
+    {
+        Client clientCalled;
+        var expected = new string[]{"A_1","B_1","C_1"};
+        var callsList = new List<string>();
+        queueA.SetPriority(1);
+        queueB.SetPriority(1);
+        queueC.SetPriority(1);
+        queueEngine.AddQueue(queueA);
+        queueEngine.AddQueue(queueB);
+        queueEngine.AddQueue(queueC);
+        queueEngine. InicializeLastcallTime();
+        queueA.Enqueue(new Client("A_1", 1));
+        queueB.Enqueue(new Client("B_1", 1));
+        queueC.Enqueue(new Client("C_1", 1));
+            
+        while ((clientCalled = queueEngine.ProcessClient()) != null)
+        {
+            callsList.Add(clientCalled.Name);
+        }
+        Assert.Equal(expected, callsList);
+    }
+    [Fact]
+    public void Deve_Chamar_Mesmo_Com_Uma_Fila()
+    {
+        Client clientCalled;
+        var expected = new string[]{"A_1","A_2","A_3","A_4"};
+        var callsList = new List<string>();
+        queueA.SetPriority(1);
+        queueEngine.AddQueue(queueA);
+
+        queueEngine. InicializeLastcallTime();
+        queueA.Enqueue(new Client("A_1", 1));
+        queueA.Enqueue(new Client("A_2", 1));
+        queueA.Enqueue(new Client("A_3", 1));
+        queueA.Enqueue(new Client("A_4", 1));
+
+        while ((clientCalled = queueEngine.ProcessClient()) != null)
+        {
+            callsList.Add(clientCalled.Name);
+        }
+        Assert.Equal(expected, callsList);
+    }
 }
