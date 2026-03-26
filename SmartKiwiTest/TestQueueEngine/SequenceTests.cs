@@ -2,19 +2,22 @@ namespace SmartKiwiTest;
 using SmartKiwiApp.Models;
 public class SequenceTests
 {
-    private readonly QueueEngine queueEngine;
+    private readonly int maxWaiteTime;
     private readonly ClientQueue queueA;
     private readonly ClientQueue queueB;
     private readonly ClientQueue queueC;
+    private  QueueEngine queueEngine;
+    private  List<ClientQueue> queueList;
     public SequenceTests()
     {
-        queueEngine = new QueueEngine(10);
         queueA = new ClientQueue("A");
         queueB = new ClientQueue("B");
         queueC = new ClientQueue("C");
         queueA.SetPriority(3);
         queueB.SetPriority(2);
         queueC.SetPriority(1);
+        queueList = new();
+        maxWaiteTime = 10;
     }
 
     [Fact]
@@ -27,9 +30,10 @@ public class SequenceTests
         queueB.Enqueue(new Client("B_1", 1));
         queueB.Enqueue(new Client("B_2", 1));
         queueC.Enqueue(new Client("C_1", 1));
-        queueEngine.AddQueue(queueA);
-        queueEngine.AddQueue(queueB);
-        queueEngine.AddQueue(queueC);
+        queueList.Add(queueA);
+        queueList.Add(queueB);
+        queueList.Add(queueC);
+        queueEngine = new QueueEngine(maxWaiteTime,queueList);
         queueEngine. InicializeLastcallTime();
 
         for (int i = 0; i < 6; i++)
@@ -65,9 +69,10 @@ public class SequenceTests
         queueB.Enqueue(new Client("B_4", 1));
         queueC.Enqueue(new Client("C_1", 1));
         queueC.Enqueue(new Client("C_2", 1));
-        queueEngine.AddQueue(queueA);
-        queueEngine.AddQueue(queueB);
-        queueEngine.AddQueue(queueC);
+        queueList.Add(queueA);
+        queueList.Add(queueB);
+        queueList.Add(queueC);
+        queueEngine = new QueueEngine(maxWaiteTime,queueList);
         queueEngine. InicializeLastcallTime();
 
         for (int i = 0; i < 12; i++)
@@ -93,7 +98,6 @@ public class SequenceTests
 
             );
    }
-    
     [Fact]
     public void Deve_Chamar_Uma_vez_Cada_Quando_Prioridades_Iguais()
     {
@@ -103,9 +107,10 @@ public class SequenceTests
         queueA.SetPriority(1);
         queueB.SetPriority(1);
         queueC.SetPriority(1);
-        queueEngine.AddQueue(queueA);
-        queueEngine.AddQueue(queueB);
-        queueEngine.AddQueue(queueC);
+        queueList.Add(queueA);
+        queueList.Add(queueB);
+        queueList.Add(queueC);
+        queueEngine = new QueueEngine(maxWaiteTime,queueList);
         queueEngine. InicializeLastcallTime();
         queueA.Enqueue(new Client("A_1", 1));
         queueB.Enqueue(new Client("B_1", 1));
@@ -123,8 +128,8 @@ public class SequenceTests
         Client clientCalled;
         var expected = new string[]{"A_1","A_2","A_3","A_4"};
         var callsList = new List<string>();
-        queueA.SetPriority(1);
-        queueEngine.AddQueue(queueA);
+        queueList.Add(queueA);
+        queueEngine = new QueueEngine(maxWaiteTime,queueList);
 
         queueEngine. InicializeLastcallTime();
         queueA.Enqueue(new Client("A_1", 1));
