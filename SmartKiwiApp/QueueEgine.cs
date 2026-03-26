@@ -1,23 +1,23 @@
-using System.Collections;
 using SmartKiwiApp.Models;
 
 public class QueueEngine
-{
-    List<ClientQueue> queueList;
-    int successfullyProcessedQueues;
+{  
     int sumOfPriotitys;
     ClientQueue lastProcessedQueue;
+    int successfullyProcessedQueues;
+    List<ClientQueue> QueueList {get; set;}
     public int MaxWaiteMinutes { get; set; }
-    public QueueEngine(int maxWaiteMinutes)
+    public QueueEngine(int maxWaiteMinutes, List<ClientQueue> queueList)
     {
-        queueList = new List<ClientQueue>();
+        QueueList = queueList;
         successfullyProcessedQueues = 0;
         MaxWaiteMinutes = maxWaiteMinutes;
+        sumOfPriotitys = SumOfPrioritys();
 
     }
     public void AddQueue(ClientQueue newQueue)
     {
-        queueList.Add(newQueue);
+        QueueList.Add(newQueue);
         sumOfPriotitys = SumOfPrioritys();
         
     }
@@ -53,7 +53,7 @@ public class QueueEngine
                 return queueInTimeout;
         }
 
-        foreach(ClientQueue queue in queueList)
+        foreach(ClientQueue queue in QueueList)
         {
 
             if( !queue.IsEmpty() && queue.currentPriority > 0 && (queue != lastProcessedQueue || activeQueues == 1))
@@ -67,7 +67,7 @@ public class QueueEngine
     {
         var sum = 0;
         
-        foreach(ClientQueue queue in queueList)
+        foreach(ClientQueue queue in QueueList)
         {
             sum += queue.Priority;
         }
@@ -75,7 +75,7 @@ public class QueueEngine
     }
     internal void resetCurrentPrioritys()
     {
-        foreach(ClientQueue queue in queueList)
+        foreach(ClientQueue queue in QueueList)
         {
             queue.currentPriority = queue.Priority;
         }
@@ -83,7 +83,7 @@ public class QueueEngine
     internal int ActiveQueuesTotal()
     {   
         var total =0;
-        foreach(var queue in queueList)
+        foreach(var queue in QueueList)
         {
             if(!queue.IsEmpty() && queue.currentPriority > 0)
             {
@@ -102,7 +102,7 @@ public class QueueEngine
     }
     internal ClientQueue HasQueueInTimeout()
     {
-        foreach(ClientQueue queue in queueList)
+        foreach(ClientQueue queue in QueueList)
         {
 
             if (queue.IsEmpty())
@@ -121,7 +121,7 @@ public class QueueEngine
      public void InicializeLastcallTime()
     {
         var initialTime = DateTime.Now;
-        foreach( ClientQueue queue in queueList)
+        foreach( ClientQueue queue in QueueList)
         {
             queue.lastCallTime = initialTime;
         }
