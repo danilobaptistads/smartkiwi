@@ -1,13 +1,9 @@
 namespace SmartKiwiApp.Models;
 
-public class Client
+public class Call
 {
-    public string Name { get; set; }
-    public int WaiteTicket { get; set; }
-    public Client(string name, int waiteTicket)
-    {
-        Name = name;
-        WaiteTicket = waiteTicket;
-
-    }
+    public Client client { get; set; }
+    public Atendante atendante { get; set; }
+    
 }
+
