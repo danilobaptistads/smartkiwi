@@ -2,19 +2,23 @@ namespace SmartKiwiTest;
 using SmartKiwiApp.Models;
 public class EmptyQueueTests
 {
-    private readonly QueueEngine queueEngine;
+    private readonly int maxWaiteTime;
     private readonly ClientQueue queueA;
     private readonly ClientQueue queueB;
     private readonly ClientQueue queueC;
+    private  QueueEngine queueEngine;
+    private  List<ClientQueue> queueList;
     public EmptyQueueTests()
     {
-        queueEngine = new QueueEngine(10);
+        
         queueA = new ClientQueue("A");
         queueB = new ClientQueue("B");
         queueC = new ClientQueue("C");
         queueA.SetPriority(3);
         queueB.SetPriority(2);
         queueC.SetPriority(1);
+        queueList = new();
+        maxWaiteTime = 10;
     }
 
     [Fact]
@@ -23,8 +27,10 @@ public class EmptyQueueTests
         queueA.Enqueue(new Client("A_1", 1));
         queueB.Enqueue(new Client("B_1", 1));
         queueB.Enqueue(new Client("B_2", 1));
-        queueEngine.AddQueue(queueA);
-        queueEngine.AddQueue(queueB);
+        queueList.Add(queueA);
+        queueList.Add(queueB);
+        queueList.Add(queueC);
+        queueEngine = new QueueEngine(maxWaiteTime,queueList);
         Client clientCalled;
         queueEngine. InicializeLastcallTime();
 
@@ -43,9 +49,10 @@ public class EmptyQueueTests
     [Fact]
     public void Deve_Retornar_Null_Se_Não_Hover_Clients_Em_Nenhuma_Fila()
     {
-        queueEngine.AddQueue(queueA);
-        queueEngine.AddQueue(queueB);
-        queueEngine.AddQueue(queueC);
+        queueList.Add(queueA);
+        queueList.Add(queueB);
+        queueList.Add(queueC);
+        queueEngine = new QueueEngine(maxWaiteTime,queueList);
 
         var clientCalled = queueEngine.ProcessClient();
         
@@ -78,10 +85,11 @@ public class EmptyQueueTests
 
     var callsList = new List<string>();
 
-    queueEngine.AddQueue(queueA);
-    queueEngine.AddQueue(queueB);
-    queueEngine.AddQueue(queueC);
-    queueEngine. InicializeLastcallTime();
+    queueList.Add(queueA);
+    queueList.Add(queueB);
+    queueList.Add(queueC);
+    queueEngine = new QueueEngine(maxWaiteTime,queueList);
+    queueEngine.InicializeLastcallTime();
 
     Client clientCalled;
 
@@ -101,12 +109,13 @@ public class EmptyQueueTests
     {
         
         Client clientCalled;
-        queueEngine.AddQueue(queueA);
-        queueEngine.AddQueue(queueB);
-        queueEngine.AddQueue(queueC);
+        queueList.Add(queueA);
+        queueList.Add(queueB);
+        queueList.Add(queueC);
+        queueEngine = new QueueEngine(maxWaiteTime,queueList);
+        queueEngine.InicializeLastcallTime();
         var callsList = new List<string>();
-        queueEngine. InicializeLastcallTime();
-
+        
         clientCalled = queueEngine.ProcessClient();
         if (clientCalled == null)
         {
