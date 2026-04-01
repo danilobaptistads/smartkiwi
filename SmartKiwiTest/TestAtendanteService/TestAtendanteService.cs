@@ -24,13 +24,13 @@ public class TesteAtendanteService
     [Fact]
     public void Deve_Retornar_Chamada_Com_Nome_Ticket_E_Atendente_Corretos()
     {
-        var atendante = new Atendante("Atendente","5");
+        var atendante = new Atendante("Atendente",5);
         
         var newCall= atendanteService.ProcessNextCall(atendante);
         
-        Assert.Equal("A_1",newCall.Client.Name);
-        Assert.Equal(214,newCall.Client.WaiteTicket);
-        Assert.Equal(atendante,newCall.Atendante);
+        Assert.Equal("A_1",newCall.ClientName);
+        Assert.Equal(atendante.Name, newCall.AtendanteName);
+        Assert.Equal(atendante.TicketWindow, newCall.TicketWindowNumber);
         
     }
 }
