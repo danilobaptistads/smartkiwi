@@ -11,8 +11,10 @@ public class AtendanteService
     {
         var clientCalled = QueueEngine.ProcessClient();
         if(clientCalled != null)
-        {
-            var call =  new Call(clientCalled,atendante);
+        {   var clientName = clientCalled.Name;
+            var atendanteName = atendante.Name;
+            var ticketWindowNumber = atendante.TicketWindow;
+            var call =  new Call(clientName, atendanteName, ticketWindowNumber);
             return call;
         }
         return null;
