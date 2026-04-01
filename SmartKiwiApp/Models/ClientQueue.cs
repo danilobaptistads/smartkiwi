@@ -1,14 +1,16 @@
 namespace SmartKiwiApp.Models;
 public class ClientQueue
 {
-    private Queue<Client> clientQueue;
-    public string Name { get; }
-    public int Priority { get; private set; }
     public int currentPriority;
     public DateTime lastCallTime;
-    
+    public Guid Id { get; private set; }
+    public string Name { get; private set;}
+    public int Priority { get; private set; }
+    private readonly Queue<Client> clientQueue;
+    protected ClientQueue() { }
     public ClientQueue(string name)
     {
+        Id = Guid.NewGuid();
         Name = name;
         clientQueue = new Queue<Client>();
         lastCallTime = DateTime.MinValue;
