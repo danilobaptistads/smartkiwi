@@ -14,4 +14,12 @@ public class User
         Email = email;
         Password = password;
     }
+
+    public void UpdateEmail(string newEmail)
+    {
+        if(newEmail != null)
+        {
+            Email = newEmail;   
+        }
+    }
 }

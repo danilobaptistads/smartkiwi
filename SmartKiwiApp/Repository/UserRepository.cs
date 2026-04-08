@@ -15,7 +15,7 @@ public class UserRepository
     }
 
 
-    public virtual async Task Add(User newUser)
+    public async Task Add(User newUser)
     {
         var exist = await _context.Users.AnyAsync(u => u.Email == newUser.Email);
         if(exist)
@@ -37,6 +37,26 @@ public class UserRepository
         }
 
         return returnedUser;
+    }
+
+    public async Task<User> GetUserById(Guid Id)
+    {
+        var returnedUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == Id);
+        if(returnedUser == null)
+        {
+            throw new InvalidOperationException("Usuárionão encontrado");
+        }
+
+        return returnedUser;
+    }
+
+    public async Task UpdateEmail(Guid currentUserId, string newEmail)
+    {
+        var userToUpdate = await GetUserById(currentUserId);
+                
+            userToUpdate.UpdateEmail(newEmail);
+            await _context.SaveChangesAsync();
+        
     }
 
 
