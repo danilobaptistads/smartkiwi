@@ -6,8 +6,6 @@ public class TesteAtendanteService
     private readonly QueueEngine queueEngine;
     private readonly AtendanteService atendanteService;
     private readonly ClientQueue queueA;
-    private readonly ClientQueue queueB;
-    private readonly ClientQueue queueC;
     private int maxWaiteTimeMinutes;
     private List<ClientQueue> queueList;
     public TesteAtendanteService()
