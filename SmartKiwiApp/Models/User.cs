@@ -22,4 +22,11 @@ public class User
             Email = newEmail;   
         }
     }
+    public void UpdateName(string newName)
+    {
+        if(newName != null)
+        {
+            Name = newName;   
+        }
+    }
 }

@@ -54,8 +54,17 @@ public class UserRepository
     {
         var userToUpdate = await GetUserById(currentUserId);
                 
-            userToUpdate.UpdateEmail(newEmail);
-            await _context.SaveChangesAsync();
+        userToUpdate.UpdateEmail(newEmail);
+        await _context.SaveChangesAsync();
+        
+    }
+
+    public async Task UpdateName(Guid currentUserId, string newName)
+    {
+        var userToUpdate = await GetUserById(currentUserId);
+                
+        userToUpdate.UpdateName(newName);
+        await _context.SaveChangesAsync();
         
     }
 

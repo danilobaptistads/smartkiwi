@@ -73,9 +73,10 @@ public class UserRepositoryTests
 
     }
 
+    [Fact]
     public async Task Deve_Alterar_Email_do_Usuario_No_Banco()
     {
-        using var context = ContextBuilder("EditUSerDb");
+        using var context = ContextBuilder("EditUSerEmailDb");
         var userRepository = new UserRepository(context);
         var user = new User("Danilo", "da@hotmail.com", "996699");
         var currentUserId = user.Id;
@@ -88,4 +89,21 @@ public class UserRepositoryTests
         Assert.Equal("danilo@hotmail", updatedUser.Email);
 
     }
+    [Fact]
+    public async Task Deve_Alterar_Nome_do_Usuario_No_Banco()
+    {
+        using var context = ContextBuilder("EditUSerNameDb");
+        var userRepository = new UserRepository(context);
+        var user = new User("Danilo", "da@hotmail.com", "996699");
+        var currentUserId = user.Id;
+        await userRepository.Add(user);
+        
+        await userRepository.UpdateName(currentUserId, "Otto");
+        
+        var updatedUser = await userRepository.GetUserById(currentUserId);      
+
+        Assert.Equal("Otto", updatedUser.Name);
+
+    }
+    
     }
