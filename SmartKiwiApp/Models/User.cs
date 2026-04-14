@@ -14,7 +14,6 @@ public class User
         Email = email;
         Password = password;
     }
-
     public void UpdateEmail(string newEmail)
     {
         if(newEmail != null)
@@ -28,5 +27,29 @@ public class User
         {
             Name = newName;   
         }
+    }
+    public void ChangePassword(string newPassword, string informedPassword, IPasswordHashService hasher)
+    {
+        var isValidPassword = hasher.VerifyPassword(informedPassword, Password);
+        if (!isValidPassword)
+        {
+            throw new Exception("Não foi possivel realizar a alteração");
+        }
+    
+        Password =hasher.HashPassword(newPassword);
+
+
+    }
+
+    public bool ValidatePassword(string informedPassword, IPasswordHashService hasher)
+    {
+        var isValidPassword = hasher.VerifyPassword(informedPassword, Password);
+        if (!isValidPassword)
+        {
+            return false;
+        }
+    
+        return true;
+
     }
 }

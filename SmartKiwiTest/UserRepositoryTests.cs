@@ -1,7 +1,10 @@
-using Microsoft.EntityFrameworkCore;
 using SmartKiwiApp.Data;
 using SmartKiwiApp.Models;
+using SmartKiwiApp.Services;
 using SmartKiwiApp.Repository;
+using Microsoft.EntityFrameworkCore;
+
+
 
 namespace SmartKiwiTest;
 public class UserRepositoryTests
@@ -106,4 +109,26 @@ public class UserRepositoryTests
 
     }
     
+    [Fact]
+    public async Task Deve_Alterar_Senha_No_Banco()
+    {
+        using var context = ContextBuilder("EditUSerPasswordeDb");
+        var userRepository = new UserRepository(context);
+        var hasherService = new PasswordHashService();
+        var userPasswordHash = hasherService.HashPassword("996699");
+        var user = new User("Danilo", "da@hotmail.com", userPasswordHash);
+        var currentUserId = user.Id;
+        await userRepository.Add(user);
+        var userToUpdate = await userRepository.GetUserById(currentUserId);
+ 
+        await userRepository.UpdatePassword( currentUserId,"196633", "996699", hasherService);
+        var updatedUser = await userRepository.GetUserById(currentUserId);
+        var validatedNewPassword = updatedUser.ValidatePassword("196633",hasherService);
+        var validatedOldPassword = updatedUser.ValidatePassword("996699",hasherService);
+
+
+        Assert.True(validatedNewPassword);
+        Assert.False(validatedOldPassword);
+        
     }
+}

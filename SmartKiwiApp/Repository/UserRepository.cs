@@ -68,5 +68,14 @@ public class UserRepository
         
     }
 
+    public async Task UpdatePassword(Guid currentUserId,  string newPassword, string informedPassword, IPasswordHashService hasher)
+    {
+        var userToUpdate = await GetUserById(currentUserId);
+
+        userToUpdate.ChangePassword(newPassword, informedPassword,hasher);
+
+        await _context.SaveChangesAsync();
+
+    }
 
 }
