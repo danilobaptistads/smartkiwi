@@ -3,7 +3,7 @@ using System.Text;
 using Konscious.Security.Cryptography;
 
 namespace SmartKiwiApp.Services;
-public class PasswordHashService
+public class PasswordHashService: IPasswordHashService
 {
     private const int HashSize = 32;
     private const int SaltSize = 16;
@@ -30,7 +30,6 @@ public class PasswordHashService
 
         return Convert.ToBase64String(result);
     }
-
     public bool VerifyPassword(string informedPassword, string hashedPassword)
     {
         var fullHash = Convert.FromBase64String(hashedPassword);
