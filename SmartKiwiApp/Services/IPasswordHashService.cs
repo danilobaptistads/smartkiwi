@@ -1,3 +1,4 @@
+namespace SmartKiwiApp.Services;
 public interface IPasswordHashService
 {
     public string HashPassword(string password);
