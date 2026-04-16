@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SmartKiwiApp.Data;
 using SmartKiwiApp.Models;
+using SmartKiwiApp.Services;
 
 namespace SmartKiwiApp.Repository;
 
