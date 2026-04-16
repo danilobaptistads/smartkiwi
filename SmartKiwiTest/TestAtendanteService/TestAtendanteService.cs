@@ -1,5 +1,6 @@
 namespace SmartKiwiTest;
 using SmartKiwiApp.Models;
+using SmartKiwiApp.Services;
 
 public class TesteAtendanteService
 {
