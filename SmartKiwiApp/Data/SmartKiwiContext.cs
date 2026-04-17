@@ -3,9 +3,9 @@ using SmartKiwiApp.Models;
 
 namespace SmartKiwiApp.Data;
 
-public class SmartKiwiContextInMemory : DbContext
+public class SmartKiwiContext : DbContext
 {
-    public SmartKiwiContextInMemory(DbContextOptions<SmartKiwiContextInMemory> options) : base(options)
+    public SmartKiwiContext(DbContextOptions<SmartKiwiContext> options) : base(options)
     {
     }
 

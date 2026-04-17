@@ -7,9 +7,9 @@ namespace SmartKiwiApp.Repository;
 
 public class UserRepository
 {
-    protected readonly SmartKiwiContextInMemory _context;
+    protected readonly SmartKiwiContext _context;
 
-    public UserRepository(SmartKiwiContextInMemory context)
+    public UserRepository(SmartKiwiContext context)
     {
         _context = context;
 

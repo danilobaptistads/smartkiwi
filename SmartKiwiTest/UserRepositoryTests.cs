@@ -14,12 +14,12 @@ public class UserRepositoryTests
     private string oldPasswordHash = "OTk2Njk5";
     private string newPasswordHash = "MTk2NjMz";
 
-    private SmartKiwiContextInMemory ContextBuilder(string databaseName)
+    private SmartKiwiContext ContextBuilder(string databaseName)
     {
-        var options = new DbContextOptionsBuilder<SmartKiwiContextInMemory>()
+        var options = new DbContextOptionsBuilder<SmartKiwiContext>()
             .UseInMemoryDatabase(databaseName: databaseName)
             .Options;
-        return new SmartKiwiContextInMemory(options);
+        return new SmartKiwiContext(options);
     }
 
     [Fact]
