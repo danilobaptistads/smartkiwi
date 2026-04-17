@@ -5,7 +5,7 @@ using SmartKiwiApp.Services;
 
 namespace SmartKiwiApp.Repository;
 
-public class UserRepository
+public class UserRepository: IUserRepository
 {
     protected readonly SmartKiwiContext _context;
 
