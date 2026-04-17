@@ -1,15 +1,19 @@
+using Moq;
 using SmartKiwiApp.Data;
 using SmartKiwiApp.Models;
 using SmartKiwiApp.Services;
 using SmartKiwiApp.Repository;
 using Microsoft.EntityFrameworkCore;
-
-
+using System.Security.Cryptography.X509Certificates;
 
 namespace SmartKiwiTest;
 public class UserRepositoryTests
-{
-   
+{   
+    private string oldPassword = "996699";
+    private string newPassword = "196633";
+    private string oldPasswordHash = "OTk2Njk5";
+    private string newPasswordHash = "MTk2NjMz";
+
     private SmartKiwiContextInMemory ContextBuilder(string databaseName)
     {
         var options = new DbContextOptionsBuilder<SmartKiwiContextInMemory>()
@@ -23,13 +27,13 @@ public class UserRepositoryTests
     {
         using var context = ContextBuilder("AddUserDb");
         var userRepository = new UserRepository(context);
-        var user = new User("Danilo", "da@hotmail.com", "996699");
+        
+        var user = new User("Danilo", "da@hotmail.com", oldPasswordHash);
 
         await userRepository.Add(user);
         var users = await context.Users.ToListAsync();
 
         Assert.Equivalent(user, users[0]);
-
 
     }
     [Fact]
@@ -37,8 +41,8 @@ public class UserRepositoryTests
     {
         using var context = ContextBuilder("AddExistetUserEmailDb");
         var userRepository = new UserRepository(context);
-        var user1 = new User("Danilo", "da@hotmail.com", "996699");
-        var user2 = new User("Daniel", "da@hotmail.com", "137713");
+        var user1 = new User("Danilo", "da@hotmail.com", oldPasswordHash);
+        var user2 = new User("Daniel", "da@hotmail.com", oldPasswordHash);
         await userRepository.Add(user1);
 
         await Assert.ThrowsAsync<InvalidOperationException>(
@@ -52,9 +56,9 @@ public class UserRepositoryTests
     {
         using var context = ContextBuilder("GetUserByEmailDb");
         var userRepository = new UserRepository(context);
-        var user = new User("Danilo", "da@hotmail.com", "996699");
+        var user = new User("Danilo", "da@hotmail.com", oldPasswordHash);
         await userRepository.Add(user);
-        
+
         var retornedUser = await userRepository.GetUserByEmail("da@hotmail.com");
 
         Assert.Equal(user.Email, retornedUser.Email );
@@ -66,7 +70,7 @@ public class UserRepositoryTests
     {
         using var context = ContextBuilder("GetUserByIdDb");
         var userRepository = new UserRepository(context);
-        var user = new User("Danilo", "da@hotmail.com", "996699");
+        var user = new User("Danilo", "da@hotmail.com", oldPasswordHash);
         var currentUserId = user.Id;
         await userRepository.Add(user);
 
@@ -81,15 +85,15 @@ public class UserRepositoryTests
     {
         using var context = ContextBuilder("EditUSerEmailDb");
         var userRepository = new UserRepository(context);
-        var user = new User("Danilo", "da@hotmail.com", "996699");
+        var user = new User("Danilo", "da@hotmail.com", oldPasswordHash);
         var currentUserId = user.Id;
         await userRepository.Add(user);
-        
-        await userRepository.UpdateEmail(currentUserId, "danilo@hotmail");
-        
+
+        await userRepository.UpdateEmail(currentUserId, "danilo@hotmail.com");
+
         var updatedUser = await userRepository.GetUserById(currentUserId);      
 
-        Assert.Equal("danilo@hotmail", updatedUser.Email);
+        Assert.Equal("danilo@hotmail.com", updatedUser.Email);
 
     }
     [Fact]
@@ -97,38 +101,40 @@ public class UserRepositoryTests
     {
         using var context = ContextBuilder("EditUSerNameDb");
         var userRepository = new UserRepository(context);
-        var user = new User("Danilo", "da@hotmail.com", "996699");
+        var user = new User("Danilo", "da@hotmail.com", oldPasswordHash);
         var currentUserId = user.Id;
         await userRepository.Add(user);
-        
+
         await userRepository.UpdateName(currentUserId, "Otto");
-        
+
         var updatedUser = await userRepository.GetUserById(currentUserId);      
 
         Assert.Equal("Otto", updatedUser.Name);
 
     }
-    
+
     [Fact]
     public async Task Deve_Alterar_Senha_No_Banco()
     {
+        var hasherServiceMock = new Mock<IPasswordHashService>();
+        hasherServiceMock.Setup(x => x.HashPassword(newPassword)).Returns(newPasswordHash);
+        hasherServiceMock.Setup(x => x.VerifyPassword(newPassword,newPasswordHash)).Returns(true);
+        hasherServiceMock.Setup(x => x.VerifyPassword(oldPassword,oldPasswordHash)).Returns(true);
+        hasherServiceMock.Setup(x => x.VerifyPassword(newPassword,oldPassword)).Returns(false);
+
         using var context = ContextBuilder("EditUSerPasswordeDb");
         var userRepository = new UserRepository(context);
-        var hasherService = new PasswordHashService();
-        var userPasswordHash = hasherService.HashPassword("996699");
-        var user = new User("Danilo", "da@hotmail.com", userPasswordHash);
-        var currentUserId = user.Id;
+        var user = new User("Danilo", "da@hotmail.com", oldPasswordHash);
         await userRepository.Add(user);
-        var userToUpdate = await userRepository.GetUserById(currentUserId);
- 
-        await userRepository.UpdatePassword( currentUserId,"196633", "996699", hasherService);
+        var currentUserId = user.Id;
+
+        await userRepository.UpdatePassword(currentUserId,"196633", "996699", hasherServiceMock.Object);
+        
         var updatedUser = await userRepository.GetUserById(currentUserId);
-        var validatedNewPassword = updatedUser.ValidatePassword("196633",hasherService);
-        var validatedOldPassword = updatedUser.ValidatePassword("996699",hasherService);
-
-
+        var validatedNewPassword = updatedUser.ValidatePassword("196633",hasherServiceMock.Object);
+        var validatedOldPassword = updatedUser.ValidatePassword("996699",hasherServiceMock.Object);
         Assert.True(validatedNewPassword);
         Assert.False(validatedOldPassword);
-        
+
     }
 }
