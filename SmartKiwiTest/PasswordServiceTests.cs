@@ -1,0 +1,96 @@
+using SmartKiwiApp.Services;
+
+public class PasswordServiceTests
+{
+    private readonly PasswordService _passwordService;
+    private readonly PasswordHashService _hashService;
+
+    public PasswordServiceTests()
+    {
+        _passwordService = new PasswordService();
+        _hashService = new PasswordHashService();
+    }
+
+    [Fact]
+    public void Deve_Retornar_True_Para_Senha_Valida()
+    {
+        var rawPassword = "Teste@123";
+
+        var result = _passwordService.ValidatePasswordFormat(rawPassword);
+
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void Deve_Retornar_False_Para_Senha_Vazia()
+    {
+        var rawPassword = "";
+
+        var result = _passwordService.ValidatePasswordFormat(rawPassword);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void Deve_Retornar_False_Para_Senha_Nula()
+    {
+        string? rawPassword = null;
+
+        var result = _passwordService.ValidatePasswordFormat(rawPassword);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void Deve_Retornar_False_Para_Senha_Menor_Que_8_Caracteres()
+    {
+        var rawPassword = "Teste@1";
+
+        var result = _passwordService.ValidatePasswordFormat(rawPassword);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void Deve_Retornar_False_Para_Senha_Sem_Caractere_Especial()
+    {
+        var rawPassword = "Teste1234";
+
+        var result = _passwordService.ValidatePasswordFormat(rawPassword);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void Deve_Retornar_False_Para_Senha_Sem_Letra_Maiuscula()
+    {
+        var rawPassword = "teste@123";
+
+        var result = _passwordService.ValidatePasswordFormat(rawPassword);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void Deve_Retornar_Hash_Para_Senha_Valida()
+    {
+        var rawPassword = "Teste@123";
+
+        var result = _passwordService.ProcssesHashNewPassword(rawPassword, _hashService);
+
+        Assert.NotNull(result);
+        Assert.NotEqual(rawPassword, result);
+    }
+
+    [Fact]
+    public void Deve_Lancar_Excecao_Para_Senha_Invalida()
+    {
+        var rawPassword = "senhainvalida";
+        
+        var exception = Assert.Throws<ArgumentException>(() => 
+            _passwordService.ProcssesHashNewPassword(rawPassword, _hashService));
+
+        Assert.Equal("Formato invalido", exception.Message);
+    }
+
+}
