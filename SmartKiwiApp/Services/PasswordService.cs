@@ -4,7 +4,7 @@ namespace SmartKiwiApp.Services;
 
 public class PasswordService
 {
-    public string ProcssesHashNewPassword(string rawPassword, IPasswordHashService hashService)
+    public string ProcssesHashNewPassword(string rawPassword, IHashService hashService)
     {
        if(ValidatePasswordFormat(rawPassword))
        {

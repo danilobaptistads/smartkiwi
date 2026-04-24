@@ -3,7 +3,7 @@ using System.Text;
 using Konscious.Security.Cryptography;
 
 namespace SmartKiwiApp.Services;
-public class PasswordHashService: IPasswordHashService
+public class HashService: IHashService
 {
     private const int HashSize = 32;
     private const int SaltSize = 16;
