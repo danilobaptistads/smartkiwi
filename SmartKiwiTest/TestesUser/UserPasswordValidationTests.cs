@@ -7,7 +7,7 @@ public class UserPasswordValidationTests
     [Fact]
     public void Deve_Validar_Senha_Da_Entidade()
     {
-        var hashServiceMock = new Mock<IPasswordHashService>();
+        var hashServiceMock = new Mock<IHashService>();
         var userPassword = "996699";
         var userHashedPassword = "OTk2Njk5";
         var informedPassword = userPassword;
@@ -23,7 +23,7 @@ public class UserPasswordValidationTests
     [Fact]
     public void Deve_Não_Validar_Senha_Da_Entidade()
     {
-        var hashServiceMock = new Mock<IPasswordHashService>();
+        var hashServiceMock = new Mock<IHashService>();
         var userPassword = "996699";
         var userHashedPassword = "OTk2Njk5";
         var informedPassword = "wrongPasswoed";

@@ -3,12 +3,12 @@ using SmartKiwiApp.Services;
 public class PasswordServiceTests
 {
     private readonly PasswordService _passwordService;
-    private readonly PasswordHashService _hashService;
+    private readonly HashService _hashService;
 
     public PasswordServiceTests()
     {
         _passwordService = new PasswordService();
-        _hashService = new PasswordHashService();
+        _hashService = new HashService();
     }
 
     [Fact]

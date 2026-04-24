@@ -10,6 +10,6 @@ public interface IUserRepository
     public  Task<User> GetUserById(Guid Id);
     public  Task UpdateEmail(Guid currentUserId, string newEmail);
     public  Task UpdateName(Guid currentUserId, string newName);
-    public  Task UpdatePassword(Guid currentUserId,  string newPassword, string informedPassword, IPasswordHashService hasher);
+    public  Task UpdatePassword(Guid currentUserId,  string newPassword, string informedPassword, IHashService hasher);
 
 }

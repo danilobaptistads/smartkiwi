@@ -69,7 +69,7 @@ public class UserRepository: IUserRepository
         
     }
 
-    public async Task UpdatePassword(Guid currentUserId,  string newPassword, string informedPassword, IPasswordHashService hasher)
+    public async Task UpdatePassword(Guid currentUserId,  string newPassword, string informedPassword, IHashService hasher)
     {
         var userToUpdate = await GetUserById(currentUserId);
 
