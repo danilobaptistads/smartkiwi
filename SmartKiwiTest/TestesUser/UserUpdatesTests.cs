@@ -74,13 +74,13 @@ public class UserUpdatesTests
     [InlineData("669966")]
     public void Deve_Não_Alterar_Senha(string informedPassword)
     {
-        var Hash = "OTk2Njk5";
-        var user = new User("Danilo", "da@hotmail.com", Hash);
-
+        var userHash = "OTk2Njk5";
+        var user = new User("Danilo", "da@hotmail.com", userHash);
+        var newPassword = "123456";
         var hashServiceMock = new Mock<IPasswordHashService>();
-        hashServiceMock.Setup(x => x.VerifyPassword(informedPassword,Hash)).Returns(false);
+        hashServiceMock.Setup(x => x.VerifyPassword(informedPassword,userHash)).Returns(false);
 
-        Action expected = ()=> user.ChangePassword("123456",informedPassword, hashServiceMock.Object);
+        Action expected = ()=> user.ChangePassword(newPassword,informedPassword, hashServiceMock.Object);
         Assert.Throws<ArgumentException>(expected);
     }
 }
