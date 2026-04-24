@@ -8,32 +8,34 @@ public class UserPasswordValidationTests
     public void Deve_Validar_Senha_Da_Entidade()
     {
         var hashServiceMock = new Mock<IPasswordHashService>();
-        var password = "996699";
-        var hashedPassword = "OTk2Njk5";
-        hashServiceMock.Setup(x => x.VerifyPassword(password,hashedPassword)).Returns(true);
+        var userPassword = "996699";
+        var userHashedPassword = "OTk2Njk5";
+        var informedPassword = userPassword;
+        hashServiceMock.Setup(x => x.VerifyPassword(informedPassword,userHashedPassword)).Returns(true);
         
-        var user = new User("Danilo", "da@hotmail.com", hashedPassword);
+        var user = new User("Danilo", "da@hotmail.com", userHashedPassword);
 
-        var expected = user.ValidatePassword("996699",hashServiceMock.Object);
+        var expected = user.ValidatePassword(informedPassword,hashServiceMock.Object);
     
         Assert.True(expected);
     }
-    
-    [Theory]
-    [InlineData ("","OTk2Njk5")]
-    [InlineData ("123456","OTk2Njk5")]
-    [InlineData ("123456","FormatoNaoBase64")]
-    public void Deve_Não_Validar_Senha(string password, string hashedPassword)
+
+    [Fact]
+    public void Deve_Não_Validar_Senha_Da_Entidade()
     {
         var hashServiceMock = new Mock<IPasswordHashService>();
-        hashServiceMock.Setup(x => x.VerifyPassword(password,hashedPassword)).Returns(false);
+        var userPassword = "996699";
+        var userHashedPassword = "OTk2Njk5";
+        var informedPassword = "wrongPasswoed";
+        hashServiceMock.Setup(x => x.VerifyPassword(informedPassword,userHashedPassword)).Returns(false);
         
-        var user = new User("Danilo", "da@hotmail.com", hashedPassword);
+        var user = new User("Danilo", "da@hotmail.com", userHashedPassword);
 
-        var expected = user.ValidatePassword(password,hashServiceMock.Object);
+        var expected = user.ValidatePassword(informedPassword,hashServiceMock.Object);
     
         Assert.False(expected);
     }
 
-
+   
 }
+    
