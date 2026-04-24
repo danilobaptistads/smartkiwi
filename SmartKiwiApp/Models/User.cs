@@ -27,28 +27,17 @@ public class User
             _email =  value;
         }
     }
-    private string Password 
-    { 
-        get => _password;
-        set
-        {
-            ValidatePasswordFormatBase64(value);
-            _password = value;
-        } 
-    }
-
     protected User() { }
     public User(string name, string email, string password)
     {
         Id = Guid.NewGuid();
         Name = name;
         Email = email;
-        Password = password;
+        _password = password;
     }
 
     public void UpdateEmail(string newEmail)
     {
-
 
         Email = newEmail;
     }
@@ -56,17 +45,6 @@ public class User
     {
 
         Name = newName;
-    }
-    public bool ValidatePassword(string informedPassword, IPasswordHashService hasher)
-    {
-        var isValidPassword = hasher.VerifyPassword(informedPassword, Password);
-        if (!isValidPassword)
-        {
-            return false;
-        }
-
-        return true;
-
     }
     private void ValidateName(string name)
     {
@@ -83,27 +61,26 @@ public class User
         if (!Regex.IsMatch(email, pattern))
             throw new ArgumentException("Email inválido.");
     }
-    private void ValidatePasswordFormatBase64(string value)
+    public bool ValidatePassword(string informedPassword, IHashService hasher)
     {
-        if (string.IsNullOrEmpty(value) )
+        var isValidPassword = hasher.VerifyPassword(informedPassword, _password);
+        if (!isValidPassword)
         {
-            throw new ArgumentException("Senha não pode ser vazia.");
-      
+            return false;
         }
-        if (!Convert.TryFromBase64String(value, new byte[value.Length], out _))
-        {
-              throw new ArgumentException("Fomato de senha inválido.");
-        }
+
+        return true;
+
     }
-    public void ChangePassword(string newPassword, string informedPassword, IPasswordHashService hasher)
+    public void ChangePassword(string newPassword, string informedPassword, IHashService hasher)
     {
-        var isValidPassword = hasher.VerifyPassword(informedPassword, Password);
+        var isValidPassword = hasher.VerifyPassword(informedPassword, _password);
         if (!isValidPassword)
         {
             throw new ArgumentException("Não foi possivel alterar a senha");
         }
 
-        Password = hasher.HashPassword(newPassword);
+        _password = hasher.HashPassword(newPassword);
 
     }
 }
