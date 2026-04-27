@@ -15,7 +15,7 @@ public class UserService
     {
         
         var hashedPassword = _hashService.HashPassword(rawPassword);
-        var newUser = new User(name, email, rawPassword);
+        var newUser = new User(name, email, hashedPassword);
         var emailAlreadyExist = await _userRepository.GetUserByEmail(newUser.Email);
         if (emailAlreadyExist !=null)
         {
