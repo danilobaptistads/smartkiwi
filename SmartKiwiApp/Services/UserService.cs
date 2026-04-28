@@ -24,4 +24,15 @@ public class UserService
         await _userRepository.Add(newUser);
         
     }
-}
+
+    public async Task UpdateUserName(Guid currentUSerID, string newName)
+    {
+        var userToUpdate = await _userRepository.GetUserById(currentUSerID);
+        if(userToUpdate == null)
+        {
+            throw new ArgumentException("Não foi possivel realizar a alteração");
+        }
+
+        await _userRepository.UpdateName(userToUpdate, newName);
+    }
+    }
