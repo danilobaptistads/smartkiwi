@@ -35,4 +35,18 @@ public class UserService
 
         await _userRepository.UpdateName(userToUpdate, newName);
     }
+
+    public async Task UpdateUserEmail(Guid currentUSerID, string currentUserPassword,string newName)
+    {
+        var userToUpdate = await _userRepository.GetUserById(currentUSerID);
+        if(userToUpdate == null)
+        {
+            throw new ArgumentException("Não foi possivel realizar a alteração");
+        }
+        if(!userToUpdate.ValidatePassword(currentUserPassword, _passwordService))
+        {
+            throw new ArgumentException("Não foi possivel realizar a alteração");
+        }
+        await _userRepository.UpdateEmail(userToUpdate, newName);
     }
+}
