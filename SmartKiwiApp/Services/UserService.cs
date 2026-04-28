@@ -5,16 +5,16 @@ namespace SmartKiwiApp.Services;
 public class UserService
 {
     private  readonly IUserRepository _userRepository;
-    private  readonly IHashService _hashService;
-    public UserService(IUserRepository repository, IHashService hashService)
+    private  readonly IPasswordService _passwordService;
+    public UserService(IUserRepository repository, IPasswordService passwordService)
     {
         _userRepository = repository;
-        _hashService = hashService;
+        _passwordService = passwordService;
     }
     public async Task CreateNewUSer(string name, string email, string rawPassword)
     {
         
-        var hashedPassword = _hashService.HashPassword(rawPassword);
+        var hashedPassword = _passwordService.ProcssesHashNewPassword(rawPassword);
         var newUser = new User(name, email, hashedPassword);
         var emailAlreadyExist = await _userRepository.GetUserByEmail(newUser.Email);
         if (emailAlreadyExist !=null)

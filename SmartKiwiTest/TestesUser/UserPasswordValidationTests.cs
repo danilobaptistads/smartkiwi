@@ -7,15 +7,14 @@ public class UserPasswordValidationTests
     [Fact]
     public void Deve_Validar_Senha_Da_Entidade()
     {
-        var hashServiceMock = new Mock<IHashService>();
+        var passworServiceMock = new Mock<IPasswordService>();
         var userPassword = "996699";
         var userHashedPassword = "OTk2Njk5";
         var informedPassword = userPassword;
-        hashServiceMock.Setup(x => x.VerifyPassword(informedPassword,userHashedPassword)).Returns(true);
-        
+        passworServiceMock.Setup(x => x.ValidatePassword(informedPassword,userHashedPassword)).Returns(true);
         var user = new User("Danilo", "da@hotmail.com", userHashedPassword);
 
-        var expected = user.ValidatePassword(informedPassword,hashServiceMock.Object);
+        var expected = user.ValidatePassword(informedPassword,passworServiceMock.Object);
     
         Assert.True(expected);
     }
@@ -23,15 +22,16 @@ public class UserPasswordValidationTests
     [Fact]
     public void Deve_Não_Validar_Senha_Da_Entidade()
     {
-        var hashServiceMock = new Mock<IHashService>();
+        
         var userPassword = "996699";
         var userHashedPassword = "OTk2Njk5";
         var informedPassword = "wrongPasswoed";
-        hashServiceMock.Setup(x => x.VerifyPassword(informedPassword,userHashedPassword)).Returns(false);
+        var passworServiceMock = new Mock<IPasswordService>();
+        passworServiceMock.Setup(x => x.ValidatePassword(informedPassword,userHashedPassword)).Returns(false);
         
         var user = new User("Danilo", "da@hotmail.com", userHashedPassword);
 
-        var expected = user.ValidatePassword(informedPassword,hashServiceMock.Object);
+        var expected = user.ValidatePassword(informedPassword,passworServiceMock.Object);
     
         Assert.False(expected);
     }

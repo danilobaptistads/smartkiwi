@@ -2,13 +2,18 @@ using System.Text.RegularExpressions;
 
 namespace SmartKiwiApp.Services;
 
-public class PasswordService
+public class PasswordService:IPasswordService
 {
-    public string ProcssesHashNewPassword(string rawPassword, IHashService hashService)
+    private readonly IHashService _hashService;
+    public PasswordService(IHashService hashService)
+    {
+        _hashService = hashService;
+    }
+    public string ProcssesHashNewPassword(string rawPassword)
     {
        if(ValidatePasswordFormat(rawPassword))
        {
-            return hashService.HashPassword(rawPassword);
+            return _hashService.HashPassword(rawPassword);
        }
 
        throw new ArgumentException("Formato invalido");
@@ -38,4 +43,12 @@ public class PasswordService
         return true;
     }
     
+    public bool ValidatePassword(string informedPassword, string hashedPassword)
+    {
+        if (!_hashService.VerifyPassword(informedPassword, hashedPassword))
+        {
+            return false;
+        }
+        return true;
+    }
 }

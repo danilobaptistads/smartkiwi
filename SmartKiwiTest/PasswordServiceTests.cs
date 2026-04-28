@@ -1,14 +1,15 @@
+using Moq;
 using SmartKiwiApp.Services;
 
 public class PasswordServiceTests
 {
+    private readonly Mock<IHashService> _hashServiceMock ;
     private readonly PasswordService _passwordService;
-    private readonly HashService _hashService;
 
     public PasswordServiceTests()
     {
-        _passwordService = new PasswordService();
-        _hashService = new HashService();
+        _hashServiceMock = new Mock<IHashService>();
+        _passwordService = new PasswordService(_hashServiceMock.Object);
     }
 
     [Fact]
@@ -44,7 +45,7 @@ public class PasswordServiceTests
     [Fact]
     public void Deve_Retornar_False_Para_Senha_Menor_Que_8_Caracteres()
     {
-        var rawPassword = "Teste@1";
+        var rawPassword = "I2E4s6";
 
         var result = _passwordService.ValidatePasswordFormat(rawPassword);
 
@@ -75,11 +76,12 @@ public class PasswordServiceTests
     public void Deve_Retornar_Hash_Para_Senha_Valida()
     {
         var rawPassword = "Teste@123";
+        _hashServiceMock.Setup(x => x.HashPassword(rawPassword)).Returns("hashed_password");
 
-        var result = _passwordService.ProcssesHashNewPassword(rawPassword, _hashService);
+        var result = _passwordService.ProcssesHashNewPassword(rawPassword);
 
         Assert.NotNull(result);
-        Assert.NotEqual(rawPassword, result);
+        Assert.Equal("hashed_password", result);
     }
 
     [Fact]
@@ -88,7 +90,7 @@ public class PasswordServiceTests
         var rawPassword = "senhainvalida";
         
         var exception = Assert.Throws<ArgumentException>(() => 
-            _passwordService.ProcssesHashNewPassword(rawPassword, _hashService));
+            _passwordService.ProcssesHashNewPassword(rawPassword));
 
         Assert.Equal("Formato invalido", exception.Message);
     }

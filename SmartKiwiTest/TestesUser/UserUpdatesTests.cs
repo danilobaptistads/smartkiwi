@@ -57,14 +57,14 @@ public class UserUpdatesTests
         var oldHash = "OTk2Njk5";
         var newHash = "MTIzNDU2";
         var user = new User("Danilo", "da@hotmail.com", "OTk2Njk5");
-        var hashServiceMock = new Mock<IHashService>();
-        hashServiceMock.Setup(x => x.HashPassword(newPassword)).Returns(newHash);
-        hashServiceMock.Setup(x => x.VerifyPassword(oldPassword, oldHash)).Returns(true);
-        hashServiceMock.Setup(x => x.VerifyPassword(newPassword,newHash)).Returns(true);
+        var passworServiceMock = new Mock<IPasswordService>();
+        passworServiceMock.Setup(x => x.ProcssesHashNewPassword(newPassword)).Returns(newHash);
+        passworServiceMock.Setup(x => x.ValidatePassword(oldPassword, oldHash)).Returns(true);
+        passworServiceMock.Setup(x => x.ValidatePassword(newPassword,newHash)).Returns(true);
         
-        user.ChangePassword("123456","996699", hashServiceMock.Object);
+        user.ChangePassword("123456","996699", passworServiceMock.Object);
         
-        var expected = user.ValidatePassword("123456",hashServiceMock.Object);
+        var expected = user.ValidatePassword("123456",passworServiceMock.Object);
     
         Assert.True(expected);
     }
@@ -77,10 +77,10 @@ public class UserUpdatesTests
         var userHash = "OTk2Njk5";
         var user = new User("Danilo", "da@hotmail.com", userHash);
         var newPassword = "123456";
-        var hashServiceMock = new Mock<IHashService>();
-        hashServiceMock.Setup(x => x.VerifyPassword(informedPassword,userHash)).Returns(false);
+        var passworServiceMock = new Mock<IPasswordService>();
+        passworServiceMock.Setup(x => x.ValidatePassword(informedPassword,userHash)).Returns(false);
 
-        Action expected = ()=> user.ChangePassword(newPassword,informedPassword, hashServiceMock.Object);
+        Action expected = ()=> user.ChangePassword(newPassword,informedPassword, passworServiceMock.Object);
         Assert.Throws<ArgumentException>(expected);
     }
 }

@@ -61,9 +61,9 @@ public class User
         if (!Regex.IsMatch(email, pattern))
             throw new ArgumentException("Email inválido.");
     }
-    public bool ValidatePassword(string informedPassword, IHashService hasher)
+    public bool ValidatePassword(string informedPassword, IPasswordService passworService)
     {
-        var isValidPassword = hasher.VerifyPassword(informedPassword, _password);
+        var isValidPassword = passworService.ValidatePassword(informedPassword, _password);
         if (!isValidPassword)
         {
             return false;
@@ -72,15 +72,15 @@ public class User
         return true;
 
     }
-    public void ChangePassword(string newPassword, string informedPassword, IHashService hasher)
+    public void ChangePassword(string newPassword, string informedPassword, IPasswordService passworService)
     {
-        var isValidPassword = hasher.VerifyPassword(informedPassword, _password);
+        var isValidPassword = passworService.ValidatePassword(informedPassword, _password);
         if (!isValidPassword)
         {
             throw new ArgumentException("Não foi possivel alterar a senha");
         }
 
-        _password = hasher.HashPassword(newPassword);
+        _password = passworService.ProcssesHashNewPassword(newPassword);
 
     }
 }
