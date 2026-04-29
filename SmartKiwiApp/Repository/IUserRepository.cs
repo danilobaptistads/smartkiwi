@@ -8,8 +8,9 @@ public interface IUserRepository
     public Task Add(User newUser);
     public Task<User> GetUserByEmail(string userEmail);
     public  Task<User> GetUserById(Guid Id);
-    public  Task UpdateEmail(Guid currentUserId, string newEmail);
-    public  Task UpdateName(Guid currentUserId, string newName);
-    public  Task UpdatePassword(Guid currentUserId,  string newPassword, string informedPassword, IHashService hasher);
+    public  Task UpdateEmail(User userToUpdate, string newEmail);
+    public  Task UpdateName(User userToUpdate, string newName);
+    public  Task UpdatePassword(User userToUpdate,  string newPassword, string informedPassword, IPasswordService hasher);
+    public  Task DeleteUser(User userToDelete);
 
 }

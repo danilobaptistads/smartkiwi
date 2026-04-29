@@ -51,32 +51,35 @@ public class UserRepository: IUserRepository
         return returnedUser;
     }
 
-    public async Task UpdateEmail(Guid currentUserId, string newEmail)
+    public async Task UpdateEmail(User userToUpdate, string newEmail)
     {
-        var userToUpdate = await GetUserById(currentUserId);
                 
         userToUpdate.UpdateEmail(newEmail);
         await _context.SaveChangesAsync();
         
     }
 
-    public async Task UpdateName(Guid currentUserId, string newName)
+    public async Task UpdateName(User userToUpdate, string newName)
     {
-        var userToUpdate = await GetUserById(currentUserId);
-                
+
         userToUpdate.UpdateName(newName);
         await _context.SaveChangesAsync();
         
     }
 
-    public async Task UpdatePassword(Guid currentUserId,  string newPassword, string informedPassword, IHashService hasher)
+    public async Task UpdatePassword(User userToUpdate,  string newPassword, string informedPassword, IPasswordService passwordService)
     {
-        var userToUpdate = await GetUserById(currentUserId);
-
-        userToUpdate.ChangePassword(newPassword, informedPassword,hasher);
+        userToUpdate.ChangePassword(newPassword, informedPassword, passwordService);
 
         await _context.SaveChangesAsync();
 
+    }
+
+    public async Task DeleteUser(User userToDelete)
+    {
+    _context.Users.Remove(userToDelete);
+    await _context.SaveChangesAsync();
+        
     }
 
 }
