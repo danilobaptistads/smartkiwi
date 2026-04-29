@@ -32,7 +32,7 @@ public class UserService
         {
             throw new ArgumentException("Não foi possivel realizar a alteração");
         }
-
+    
         await _userRepository.UpdateName(userToUpdate, newName);
     }
 
@@ -48,5 +48,27 @@ public class UserService
             throw new ArgumentException("Não foi possivel realizar a alteração");
         }
         await _userRepository.UpdateEmail(userToUpdate, newName);
+    }
+
+    public async Task UpdateUserPassword(Guid currentUSerId, string newPassword, string informedPassword)
+    {
+        var userToUpdate = await _userRepository.GetUserById(currentUSerId);
+        if(userToUpdate == null || !userToUpdate.ValidatePassword(informedPassword, _passwordService))
+        {
+            throw new ArgumentException("Não foi possivel realizar a alteração");
+        }
+        await _userRepository.UpdatePassword(userToUpdate, newPassword, informedPassword, _passwordService);
+    }
+
+    public async Task DeleteCurrentUser(Guid currentUserId,string informedPassword)
+    {
+        var userToDelete = await _userRepository.GetUserById(currentUserId);
+        if(userToDelete == null || !userToDelete.ValidatePassword(informedPassword, _passwordService))
+        {
+            throw new ArgumentException("Não foi possivel realizar a alteração");
+        }
+
+        await _userRepository.DeleteUser(userToDelete);
+
     }
 }
