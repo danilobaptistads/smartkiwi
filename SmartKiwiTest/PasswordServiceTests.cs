@@ -95,4 +95,30 @@ public class PasswordServiceTests
         Assert.Equal("Formato invalido", exception.Message);
     }
 
+    [Fact]
+    public void Deve_Retornar_True_Para_Senha_Valida_Com_Hash()
+    {
+        var informedPassword = "Teste@123";
+        var hashedPassword = "hashed_value";
+
+        _hashServiceMock.Setup(x => x.VerifyPassword(informedPassword, hashedPassword)).Returns(true);
+
+        var result = _passwordService.ValidatePassword(informedPassword, hashedPassword);
+
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void Deve_Retornar_False_Para_Senha_Invalida_Com_Hash()
+    {
+        var informedPassword = "SenhaErrada@123";
+        var hashedPassword = "hashed_value";
+
+        _hashServiceMock.Setup(x => x.VerifyPassword(informedPassword, hashedPassword)).Returns(false);
+
+        var result = _passwordService.ValidatePassword(informedPassword, hashedPassword);
+
+        Assert.False(result);
+    }
+
 }

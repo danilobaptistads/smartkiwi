@@ -15,12 +15,12 @@ public class QueueEngine
         sumOfPriotitys = SumOfPrioritys();
 
     }
-    public void AddQueue(ClientQueue newQueue)
-    {
-        QueueList.Add(newQueue);
-        sumOfPriotitys = SumOfPrioritys();
+    // public void AddQueue(ClientQueue newQueue)
+    // {
+    //     QueueList.Add(newQueue);
+    //     sumOfPriotitys = SumOfPrioritys();
         
-    }
+    // }
     
     public Client ProcessClient()
     {

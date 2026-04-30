@@ -32,4 +32,15 @@ public class TesteAtendanteService
         Assert.Equal(atendante.TicketWindow, newCall.TicketWindowNumber);
         
     }
+
+    [Fact]
+    public void Deve_Retornar_Null_Na_Segunda_Chamada()
+    {
+        var atendante = new Atendante("Atendente",5);
+        
+        var newCall= atendanteService.ProcessNextCall(atendante);
+        newCall= atendanteService.ProcessNextCall(atendante);
+        Assert.Null(newCall);
+      
+    }
 }
