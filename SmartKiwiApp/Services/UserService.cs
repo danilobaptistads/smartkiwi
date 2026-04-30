@@ -4,12 +4,15 @@ using SmartKiwiApp.Repository;
 namespace SmartKiwiApp.Services;
 public class UserService
 {
-    private  readonly IUserRepository _userRepository;
-    private  readonly IPasswordService _passwordService;
-    public UserService(IUserRepository repository, IPasswordService passwordService)
+    private readonly ITokenService _tokenService;
+    private readonly IUserRepository _userRepository;
+    private readonly IPasswordService _passwordService;
+    public UserService(IUserRepository repository, IPasswordService passwordService, ITokenService tokenService)
     {
         _userRepository = repository;
+        _tokenService = tokenService;
         _passwordService = passwordService;
+        
     }
     public async Task CreateNewUSer(string name, string email, string rawPassword)
     {
@@ -69,6 +72,19 @@ public class UserService
         }
 
         await _userRepository.DeleteUser(userToDelete);
+
+    }
+
+    public async Task<string> AuthenticateUser(string informedEmail, string informedPassword)
+    {
+        var userToAuthenticate = await _userRepository.GetUserByEmail(informedEmail);
+        if(userToAuthenticate == null || !userToAuthenticate.ValidatePassword(informedPassword, _passwordService))
+        {
+            throw new UnauthorizedAccessException("Usuário ou senha inválidos");
+            
+        }
+        return _tokenService.GenerateToken(userToAuthenticate);
+        
 
     }
 }

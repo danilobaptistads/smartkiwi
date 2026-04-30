@@ -5,14 +5,16 @@ using SmartKiwiApp.Services;
 using SmartKiwiApp.Repository;
 public class UserServiceUpdateTests
 {
+    private readonly Mock<ITokenService> _tokenServiceMock;
     private readonly Mock<IUserRepository> _userRepositoryMock;
     private readonly Mock<IPasswordService> _passwordServiceMock;
     private readonly UserService _userService;
     public UserServiceUpdateTests()
     {
+        _tokenServiceMock = new Mock<ITokenService>();
         _userRepositoryMock = new Mock<IUserRepository>();
         _passwordServiceMock = new Mock<IPasswordService>();
-        _userService = new UserService( _userRepositoryMock.Object, _passwordServiceMock.Object);
+        _userService = new UserService( _userRepositoryMock.Object, _passwordServiceMock.Object, _tokenServiceMock.Object);
     }
 
     [Fact]

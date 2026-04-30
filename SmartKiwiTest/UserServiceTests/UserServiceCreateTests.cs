@@ -5,20 +5,25 @@ using SmartKiwiApp.Services;
 using SmartKiwiApp.Repository;
 public class UserServiceCreateTests
 {
+    private readonly Mock<ITokenService> _tokenServiceMock;
     private readonly Mock<IUserRepository> _userRepositoryMock;
-
     private readonly Mock<IPasswordService> _passwordServiceMock;
+    private readonly UserService userService;
+    
     public UserServiceCreateTests()
     {
+        _tokenServiceMock = new Mock<ITokenService>();
         _userRepositoryMock = new Mock<IUserRepository>();
         _passwordServiceMock = new Mock<IPasswordService>();
+        userService = new UserService( _userRepositoryMock.Object, _passwordServiceMock.Object, _tokenServiceMock.Object);
+        
     }
     [Fact]
     public async Task Deve_Chamar_Metodos_Add_E_GEtEmailById_E_ProcssesHashNewPassword()
     {
         var userRawPassword = "996699";
         var userHashedPassword = "OTk2Njk5";
-        var userService = new UserService( _userRepositoryMock.Object, _passwordServiceMock.Object);
+        
         
         _userRepositoryMock.Setup(x => x.Add(It.IsAny<User>())).Returns(Task.CompletedTask);
         _userRepositoryMock.Setup(x => x.GetUserByEmail("dan@hotmail.com")).ReturnsAsync((User)null);
@@ -39,7 +44,6 @@ public class UserServiceCreateTests
         var NewUserHashedPAssword = "OTk2Njk5";
         var AlreadyRegisteredEmail = "dan@hotmail.com";
         var userDummy = new User("dummy", "dan@hotmail.com", "anyhash");
-        var userService = new UserService( _userRepositoryMock.Object, _passwordServiceMock.Object);
 
         _userRepositoryMock.Setup(x => x.GetUserByEmail(AlreadyRegisteredEmail)).ReturnsAsync(userDummy);
         
