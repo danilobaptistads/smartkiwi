@@ -4,7 +4,6 @@ using SmartKiwiApp.Models;
 using SmartKiwiApp.Services;
 using SmartKiwiApp.Repository;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography.X509Certificates;
 
 namespace SmartKiwiTest;
 public class UserRepositoryTests
@@ -86,12 +85,11 @@ public class UserRepositoryTests
         using var context = ContextBuilder("EditUSerEmailDb");
         var userRepository = new UserRepository(context);
         var user = new User("Danilo", "da@hotmail.com", oldPasswordHash);
-        var currentUserId = user.Id;
         await userRepository.Add(user);
 
-        await userRepository.UpdateEmail(currentUserId, "danilo@hotmail.com");
+        await userRepository.UpdateEmail(user, "danilo@hotmail.com");
 
-        var updatedUser = await userRepository.GetUserById(currentUserId);      
+        var updatedUser = await userRepository.GetUserById(user.Id);      
 
         Assert.Equal("danilo@hotmail.com", updatedUser.Email);
 
@@ -102,12 +100,11 @@ public class UserRepositoryTests
         using var context = ContextBuilder("EditUSerNameDb");
         var userRepository = new UserRepository(context);
         var user = new User("Danilo", "da@hotmail.com", oldPasswordHash);
-        var currentUserId = user.Id;
         await userRepository.Add(user);
 
-        await userRepository.UpdateName(currentUserId, "Otto");
+        await userRepository.UpdateName(user, "Otto");
 
-        var updatedUser = await userRepository.GetUserById(currentUserId);      
+        var updatedUser = await userRepository.GetUserById(user.Id);      
 
         Assert.Equal("Otto", updatedUser.Name);
 
@@ -116,23 +113,22 @@ public class UserRepositoryTests
     [Fact]
     public async Task Deve_Alterar_Senha_No_Banco()
     {
-        var hasherServiceMock = new Mock<IPasswordHashService>();
-        hasherServiceMock.Setup(x => x.HashPassword(newPassword)).Returns(newPasswordHash);
-        hasherServiceMock.Setup(x => x.VerifyPassword(newPassword,newPasswordHash)).Returns(true);
-        hasherServiceMock.Setup(x => x.VerifyPassword(oldPassword,oldPasswordHash)).Returns(true);
-        hasherServiceMock.Setup(x => x.VerifyPassword(newPassword,oldPassword)).Returns(false);
+        var hasherServiceMock = new Mock<IPasswordService>();
+        hasherServiceMock.Setup(x => x.ProcssesHashNewPassword(newPassword)).Returns(newPasswordHash);
+        hasherServiceMock.Setup(x => x.ValidatePassword(oldPassword,oldPasswordHash)).Returns(true);
+        hasherServiceMock.Setup(x => x.ValidatePassword(newPassword,oldPasswordHash)).Returns(false);
+        hasherServiceMock.Setup(x => x.ValidatePassword(newPassword,newPasswordHash)).Returns(true);
 
         using var context = ContextBuilder("EditUSerPasswordeDb");
         var userRepository = new UserRepository(context);
         var user = new User("Danilo", "da@hotmail.com", oldPasswordHash);
         await userRepository.Add(user);
-        var currentUserId = user.Id;
 
-        await userRepository.UpdatePassword(currentUserId,"196633", "996699", hasherServiceMock.Object);
+        await userRepository.UpdatePassword(user, newPassword, oldPassword, hasherServiceMock.Object);
         
-        var updatedUser = await userRepository.GetUserById(currentUserId);
-        var validatedNewPassword = updatedUser.ValidatePassword("196633",hasherServiceMock.Object);
-        var validatedOldPassword = updatedUser.ValidatePassword("996699",hasherServiceMock.Object);
+        var updatedUser = await userRepository.GetUserById(user.Id);
+        var validatedNewPassword = updatedUser.ValidatePassword(newPassword,hasherServiceMock.Object);
+        var validatedOldPassword = updatedUser.ValidatePassword(oldPassword,hasherServiceMock.Object);
         Assert.True(validatedNewPassword);
         Assert.False(validatedOldPassword);
 
