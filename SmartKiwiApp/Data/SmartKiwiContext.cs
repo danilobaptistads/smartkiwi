@@ -10,6 +10,6 @@ public class SmartKiwiContext : DbContext
     }
 
     public DbSet<Call> Calls { get; set; }
-    public DbSet<User> Users { get; set; }
+    public DbSet<CleintQueue> Users { get; set; }
     public DbSet<Workstation> Workstations { get; set; }
 }
