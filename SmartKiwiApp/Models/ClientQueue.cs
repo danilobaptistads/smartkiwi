@@ -5,16 +5,20 @@ public class ClientQueue
     public DateTime lastCallTime;
     public Guid Id { get; private set; }
     public string Name { get; private set;}
+    public Guid WonerId { get; private set; }
     public int Priority { get; private set; }
     private readonly Queue<Client> clientQueue;
     protected ClientQueue() { }
-    public ClientQueue(string name)
+public ClientQueue(string name, Guid wonerId,int priority)
     {
         Id = Guid.NewGuid();
         Name = name;
+        Priority = priority;
+        WonerId = wonerId;
+        currentPriority = priority;
         clientQueue = new Queue<Client>();
         lastCallTime = DateTime.MinValue;
-      
+       
     }
 
     public void Enqueue(Client client)

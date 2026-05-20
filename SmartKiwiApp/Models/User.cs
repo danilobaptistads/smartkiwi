@@ -2,7 +2,7 @@ using SmartKiwiApp.Services;
 namespace SmartKiwiApp.Models;
 using System.Text.RegularExpressions;
 
-public class User
+public class CleintQueue
 {
     
     private string _name;
@@ -27,8 +27,8 @@ public class User
             _email =  value;
         }
     }
-    protected User() { }
-    public User(string name, string email, string password)
+    protected CleintQueue() { }
+    public CleintQueue(string name, string email, string password)
     {
         Id = Guid.NewGuid();
         Name = name;

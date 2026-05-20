@@ -27,7 +27,7 @@ public class UserRepositoryTests
         using var context = ContextBuilder("AddUserDb");
         var userRepository = new UserRepository(context);
         
-        var user = new User("Danilo", "da@hotmail.com", oldPasswordHash);
+        var user = new CleintQueue("Danilo", "da@hotmail.com", oldPasswordHash);
 
         await userRepository.Add(user);
         var users = await context.Users.ToListAsync();
@@ -40,8 +40,8 @@ public class UserRepositoryTests
     {
         using var context = ContextBuilder("AddExistetUserEmailDb");
         var userRepository = new UserRepository(context);
-        var user1 = new User("Danilo", "da@hotmail.com", oldPasswordHash);
-        var user2 = new User("Daniel", "da@hotmail.com", oldPasswordHash);
+        var user1 = new CleintQueue("Danilo", "da@hotmail.com", oldPasswordHash);
+        var user2 = new CleintQueue("Daniel", "da@hotmail.com", oldPasswordHash);
         await userRepository.Add(user1);
 
         await Assert.ThrowsAsync<InvalidOperationException>(
@@ -55,7 +55,7 @@ public class UserRepositoryTests
     {
         using var context = ContextBuilder("GetUserByEmailDb");
         var userRepository = new UserRepository(context);
-        var user = new User("Danilo", "da@hotmail.com", oldPasswordHash);
+        var user = new CleintQueue("Danilo", "da@hotmail.com", oldPasswordHash);
         await userRepository.Add(user);
 
         var retornedUser = await userRepository.GetUserByEmail("da@hotmail.com");
@@ -69,7 +69,7 @@ public class UserRepositoryTests
     {
         using var context = ContextBuilder("GetUserByIdDb");
         var userRepository = new UserRepository(context);
-        var user = new User("Danilo", "da@hotmail.com", oldPasswordHash);
+        var user = new CleintQueue("Danilo", "da@hotmail.com", oldPasswordHash);
         var currentUserId = user.Id;
         await userRepository.Add(user);
 
@@ -84,7 +84,7 @@ public class UserRepositoryTests
     {
         using var context = ContextBuilder("EditUSerEmailDb");
         var userRepository = new UserRepository(context);
-        var user = new User("Danilo", "da@hotmail.com", oldPasswordHash);
+        var user = new CleintQueue("Danilo", "da@hotmail.com", oldPasswordHash);
         await userRepository.Add(user);
 
         await userRepository.UpdateEmail(user, "danilo@hotmail.com");
@@ -99,7 +99,7 @@ public class UserRepositoryTests
     {
         using var context = ContextBuilder("EditUSerNameDb");
         var userRepository = new UserRepository(context);
-        var user = new User("Danilo", "da@hotmail.com", oldPasswordHash);
+        var user = new CleintQueue("Danilo", "da@hotmail.com", oldPasswordHash);
         await userRepository.Add(user);
 
         await userRepository.UpdateName(user, "Otto");
@@ -121,7 +121,7 @@ public class UserRepositoryTests
 
         using var context = ContextBuilder("EditUSerPasswordeDb");
         var userRepository = new UserRepository(context);
-        var user = new User("Danilo", "da@hotmail.com", oldPasswordHash);
+        var user = new CleintQueue("Danilo", "da@hotmail.com", oldPasswordHash);
         await userRepository.Add(user);
 
         await userRepository.UpdatePassword(user, newPassword, oldPassword, hasherServiceMock.Object);

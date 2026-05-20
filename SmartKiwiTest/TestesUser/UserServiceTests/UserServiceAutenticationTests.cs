@@ -23,14 +23,14 @@ public class UserServiceAutenticationTests
     {
         var informedPassword = "C0rrectP@ssWord";
         var informedEmail = "danilo@hotmail.com";
-        var userDummy = new User("danilo","danilo@hotmail.com", "C0rrectP@ssWord");
-        _tokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<User>())).Returns("MokcTokenTeste");
+        var userDummy = new CleintQueue("danilo","danilo@hotmail.com", "C0rrectP@ssWord");
+        _tokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<CleintQueue>())).Returns("MokcTokenTeste");
         _passwordServiceMock.Setup(x => x.ValidatePassword(informedPassword,It.IsAny<string>())).Returns(true);
         _userRepositoryMock.Setup(x => x.GetUserByEmail(informedEmail)).ReturnsAsync(userDummy);
         var expected = await _userService.AuthenticateUser(informedEmail, informedPassword);
         
         Assert.Equal("MokcTokenTeste",expected);
-        _tokenServiceMock.Verify(x => x.GenerateToken(It.IsAny<User>()), Times.Once);
+        _tokenServiceMock.Verify(x => x.GenerateToken(It.IsAny<CleintQueue>()), Times.Once);
     }
 
     [Fact]
@@ -38,13 +38,13 @@ public class UserServiceAutenticationTests
     {
         var informedPassword = "Wr0ngP@ssWord";
         var informedEmail = "danilo@hotmail.com";
-        var userDummy = new User("danilo","danilo@hotmail.com", "C0rrectP@ssWord");
-        _tokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<User>())).Returns("MokcTokenTeste");
+        var userDummy = new CleintQueue("danilo","danilo@hotmail.com", "C0rrectP@ssWord");
+        _tokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<CleintQueue>())).Returns("MokcTokenTeste");
         _passwordServiceMock.Setup(x => x.ValidatePassword(informedPassword,It.IsAny<string>())).Returns(false);
         _userRepositoryMock.Setup(x => x.GetUserByEmail(informedEmail)).ReturnsAsync(userDummy);
         
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _userService.AuthenticateUser(informedEmail, informedPassword));
-        _tokenServiceMock.Verify(x => x.GenerateToken(It.IsAny<User>()),Times.Never);
+        _tokenServiceMock.Verify(x => x.GenerateToken(It.IsAny<CleintQueue>()),Times.Never);
     }
 
     [Fact]
@@ -52,13 +52,13 @@ public class UserServiceAutenticationTests
     {
         var informedPassword = "C0rrectP@ssWord";
         var informedEmail = "Wrong@Email.com";
-        var userDummy = new User("danilo","danilo@hotmail.com", "C0rrectP@ssWord");
-        _tokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<User>())).Returns("MokcTokenTeste");
+        var userDummy = new CleintQueue("danilo","danilo@hotmail.com", "C0rrectP@ssWord");
+        _tokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<CleintQueue>())).Returns("MokcTokenTeste");
         //_passwordServiceMock.Setup(x => x.ValidatePassword(informedPassword,It.IsAny<string>())).Returns(false);
-        _userRepositoryMock.Setup(x => x.GetUserByEmail(informedEmail)).ReturnsAsync((User)null);
+        _userRepositoryMock.Setup(x => x.GetUserByEmail(informedEmail)).ReturnsAsync((CleintQueue)null);
         
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _userService.AuthenticateUser(informedEmail, informedPassword));
-        _tokenServiceMock.Verify(x => x.GenerateToken(It.IsAny<User>()),Times.Never);
+        _tokenServiceMock.Verify(x => x.GenerateToken(It.IsAny<CleintQueue>()),Times.Never);
     }
 
 }

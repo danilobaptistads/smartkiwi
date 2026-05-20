@@ -11,12 +11,10 @@ public class EmptyQueueTests
     public EmptyQueueTests()
     {
         
-        queueA = new ClientQueue("A");
-        queueB = new ClientQueue("B");
-        queueC = new ClientQueue("C");
-        queueA.SetPriority(3);
-        queueB.SetPriority(2);
-        queueC.SetPriority(1);
+        queueA = new ClientQueue("A", new Guid(), 3);
+        queueB = new ClientQueue("B", new Guid(), 2);
+        queueC = new ClientQueue("C", new Guid(), 1);
+
         queueList = new();
         maxWaiteTime = 10;
     }

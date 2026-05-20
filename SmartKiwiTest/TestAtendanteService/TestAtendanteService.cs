@@ -11,8 +11,7 @@ public class TesteAtendanteService
     private List<ClientQueue> queueList;
     public TesteAtendanteService()
     {
-        queueA = new ClientQueue("A");
-        queueA.SetPriority(3);
+        queueA = new ClientQueue("A", new Guid(),3);
         queueList = new(){queueA};
         maxWaiteTimeMinutes = 10;
         queueEngine = new QueueEngine(maxWaiteTimeMinutes,queueList);

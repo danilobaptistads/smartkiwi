@@ -8,7 +8,7 @@ public class UserUpdatesTests
     {
         
         var userPasswordHash = "OTk2Njk5";
-        var user = new User("Danilo", "da@hotmail.com", userPasswordHash);
+        var user = new CleintQueue("Danilo", "da@hotmail.com", userPasswordHash);
     
         user.UpdateEmail("danilo@hotmail.com");
     
@@ -21,7 +21,7 @@ public class UserUpdatesTests
     public void Deve_Não_Fazer_Update_do_Email_Vazio_Ou_Formato_Incorreto(string newEmail)
     {
         var userPasswordHash = "OTk2Njk5";
-        var user = new User("Danilo", "da@hotmail.com", userPasswordHash);
+        var user = new CleintQueue("Danilo", "da@hotmail.com", userPasswordHash);
     
         Action updateEmail = () => user.UpdateEmail(newEmail);
     
@@ -32,7 +32,7 @@ public class UserUpdatesTests
     public void Deve_Fazer_Update_do_Nome()
     {
         var userPasswordHash = "OTk2Njk5";
-        var user = new User("Danilo", "da@hotmail.com", userPasswordHash);
+        var user = new CleintQueue("Danilo", "da@hotmail.com", userPasswordHash);
     
         user.UpdateName("Otto");
     
@@ -43,7 +43,7 @@ public class UserUpdatesTests
     public void Deve_Não_Fazer_Update_do_Nome_Quando_Vazio()
     {
         var userPasswordHash = "OTk2Njk5";
-        var user = new User("Danilo", "da@hotmail.com", userPasswordHash);
+        var user = new CleintQueue("Danilo", "da@hotmail.com", userPasswordHash);
     
         Action updateName = () => user.UpdateName("");
     
@@ -56,7 +56,7 @@ public class UserUpdatesTests
         var newPassword = "123456"; 
         var oldHash = "OTk2Njk5";
         var newHash = "MTIzNDU2";
-        var user = new User("Danilo", "da@hotmail.com", "OTk2Njk5");
+        var user = new CleintQueue("Danilo", "da@hotmail.com", "OTk2Njk5");
         var passworServiceMock = new Mock<IPasswordService>();
         passworServiceMock.Setup(x => x.ProcssesHashNewPassword(newPassword)).Returns(newHash);
         passworServiceMock.Setup(x => x.ValidatePassword(oldPassword, oldHash)).Returns(true);
@@ -75,7 +75,7 @@ public class UserUpdatesTests
     public void Deve_Não_Alterar_Senha(string informedPassword)
     {
         var userHash = "OTk2Njk5";
-        var user = new User("Danilo", "da@hotmail.com", userHash);
+        var user = new CleintQueue("Danilo", "da@hotmail.com", userHash);
         var newPassword = "123456";
         var passworServiceMock = new Mock<IPasswordService>();
         passworServiceMock.Setup(x => x.ValidatePassword(informedPassword,userHash)).Returns(false);
