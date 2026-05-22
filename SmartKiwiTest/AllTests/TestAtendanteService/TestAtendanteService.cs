@@ -1,0 +1,45 @@
+namespace SmartKiwiTest;
+using SmartKiwiApp.Models;
+using SmartKiwiApp.Services;
+
+public class TesteAtendanteService
+{
+    private readonly QueueEngine queueEngine;
+    private readonly AtendanteService atendanteService;
+    private readonly ClientQueue queueA;
+    private int maxWaiteTimeMinutes;
+    private List<ClientQueue> queueList;
+    public TesteAtendanteService()
+    {
+        queueA = new ClientQueue("A", new Guid(),3);
+        queueList = new(){queueA};
+        maxWaiteTimeMinutes = 10;
+        queueEngine = new QueueEngine(maxWaiteTimeMinutes,queueList);
+        atendanteService = new AtendanteService(queueEngine);
+        queueA.Enqueue(new Client("A_1", 214));
+    }
+
+    [Fact]
+    public void Deve_Retornar_Chamada_Com_Nome_Ticket_E_Atendente_Corretos()
+    {
+        var atendante = new Atendante("Atendente",5);
+        
+        var newCall= atendanteService.ProcessNextCall(atendante);
+        
+        Assert.Equal("A_1",newCall.ClientName);
+        Assert.Equal(atendante.Name, newCall.AtendanteName);
+        Assert.Equal(atendante.TicketWindow, newCall.TicketWindowNumber);
+        
+    }
+
+    [Fact]
+    public void Deve_Retornar_Null_Na_Segunda_Chamada()
+    {
+        var atendante = new Atendante("Atendente",5);
+        
+        var newCall= atendanteService.ProcessNextCall(atendante);
+        newCall= atendanteService.ProcessNextCall(atendante);
+        Assert.Null(newCall);
+      
+    }
+}
