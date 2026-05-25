@@ -4,7 +4,6 @@ using SmartKiwiApp.Models;
 using SmartKiwiApp.Services;
 
 namespace SmartKiwiApp.Repository;
-
 public class UserRepository: IUserRepository
 {
     protected readonly SmartKiwiContext _context;
@@ -16,7 +15,7 @@ public class UserRepository: IUserRepository
     }
 
 
-    public async Task Add(CleintQueue newUser)
+    public async Task Add(User newUser)
     {
         var exist = await _context.Users.AnyAsync(u => u.Email == newUser.Email);
         if(exist)
@@ -29,7 +28,7 @@ public class UserRepository: IUserRepository
         
     }
 
-    public async Task<CleintQueue> GetUserByEmail(string userEmail)
+    public async Task<User> GetUserByEmail(string userEmail)
     {
         var returnedUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
         if(returnedUser == null)
@@ -40,7 +39,7 @@ public class UserRepository: IUserRepository
         return returnedUser;
     }
 
-    public async Task<CleintQueue> GetUserById(Guid Id)
+    public async Task<User> GetUserById(Guid Id)
     {
         var returnedUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == Id);
         if(returnedUser == null)
@@ -51,7 +50,7 @@ public class UserRepository: IUserRepository
         return returnedUser;
     }
 
-    public async Task UpdateEmail(CleintQueue userToUpdate, string newEmail)
+    public async Task UpdateEmail(User userToUpdate, string newEmail)
     {
                 
         userToUpdate.UpdateEmail(newEmail);
@@ -59,7 +58,7 @@ public class UserRepository: IUserRepository
         
     }
 
-    public async Task UpdateName(CleintQueue userToUpdate, string newName)
+    public async Task UpdateName(User userToUpdate, string newName)
     {
 
         userToUpdate.UpdateName(newName);
@@ -67,7 +66,7 @@ public class UserRepository: IUserRepository
         
     }
 
-    public async Task UpdatePassword(CleintQueue userToUpdate,  string newPassword, string informedPassword, IPasswordService passwordService)
+    public async Task UpdatePassword(User userToUpdate,  string newPassword, string informedPassword, IPasswordService passwordService)
     {
         userToUpdate.ChangePassword(newPassword, informedPassword, passwordService);
 
@@ -75,7 +74,7 @@ public class UserRepository: IUserRepository
 
     }
 
-    public async Task DeleteUser(CleintQueue userToDelete)
+    public async Task DeleteUser(User userToDelete)
     {
     _context.Users.Remove(userToDelete);
     await _context.SaveChangesAsync();

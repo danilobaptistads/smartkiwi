@@ -1,14 +1,17 @@
 using SmartKiwiApp.Services;
-namespace SmartKiwiApp.Models;
 using System.Text.RegularExpressions;
 
-public class CleintQueue
+namespace SmartKiwiApp.Models;
+public class User
 {
-    
+    public enum Role { Admin, Employee }
+
     private string _name;
     private string _email;
     private string _password;
+    private Role _role;
     public Guid Id { get; private set; }
+    public Role UserRole => _role;
     public string Name 
     { 
         get => _name; 
@@ -27,13 +30,14 @@ public class CleintQueue
             _email =  value;
         }
     }
-    protected CleintQueue() { }
-    public CleintQueue(string name, string email, string password)
+    protected User() { }
+    public User(string name, string email, string password, Role role = Role.Employee)
     {
         Id = Guid.NewGuid();
         Name = name;
         Email = email;
         _password = password;
+        _role = role;
     }
 
     public void UpdateEmail(string newEmail)
@@ -45,6 +49,10 @@ public class CleintQueue
     {
 
         Name = newName;
+    }
+    public void SetRole(Role role)
+    {
+        _role = role;
     }
     private void ValidateName(string name)
     {
@@ -61,9 +69,9 @@ public class CleintQueue
         if (!Regex.IsMatch(email, pattern))
             throw new ArgumentException("Email inválido.");
     }
-    public bool ValidatePassword(string informedPassword, IPasswordService passworService)
+    public bool ValidatePassword(string informedPassword, IPasswordService passwordService)
     {
-        var isValidPassword = passworService.ValidatePassword(informedPassword, _password);
+        var isValidPassword = passwordService.ValidatePassword(informedPassword, _password);
         if (!isValidPassword)
         {
             return false;
@@ -72,15 +80,15 @@ public class CleintQueue
         return true;
 
     }
-    public void ChangePassword(string newPassword, string informedPassword, IPasswordService passworService)
+    public void ChangePassword(string newPassword, string informedPassword, IPasswordService passwordService)
     {
-        var isValidPassword = passworService.ValidatePassword(informedPassword, _password);
+        var isValidPassword = passwordService.ValidatePassword(informedPassword, _password);
         if (!isValidPassword)
         {
             throw new ArgumentException("Não foi possivel alterar a senha");
         }
 
-        _password = passworService.ProcssesHashNewPassword(newPassword);
+        _password = passwordService.ProcssesHashNewPassword(newPassword);
 
     }
 }

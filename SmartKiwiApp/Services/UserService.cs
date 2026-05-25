@@ -18,7 +18,7 @@ public class UserService
     {
         
         var hashedPassword = _passwordService.ProcssesHashNewPassword(rawPassword);
-        var newUser = new CleintQueue(name, email, hashedPassword);
+        var newUser = new User(name, email, hashedPassword);
         var emailAlreadyExist = await _userRepository.GetUserByEmail(newUser.Email);
         if (emailAlreadyExist !=null)
         {

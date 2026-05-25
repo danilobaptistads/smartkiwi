@@ -12,7 +12,7 @@ public class UserPasswordValidationTests
         var userHashedPassword = "OTk2Njk5";
         var informedPassword = userPassword;
         passworServiceMock.Setup(x => x.ValidatePassword(informedPassword,userHashedPassword)).Returns(true);
-        var user = new CleintQueue("Danilo", "da@hotmail.com", userHashedPassword);
+        var user = new User("Danilo", "da@hotmail.com", userHashedPassword);
 
         var expected = user.ValidatePassword(informedPassword,passworServiceMock.Object);
     
@@ -29,7 +29,7 @@ public class UserPasswordValidationTests
         var passworServiceMock = new Mock<IPasswordService>();
         passworServiceMock.Setup(x => x.ValidatePassword(informedPassword,userHashedPassword)).Returns(false);
         
-        var user = new CleintQueue("Danilo", "da@hotmail.com", userHashedPassword);
+        var user = new User("Danilo", "da@hotmail.com", userHashedPassword);
 
         var expected = user.ValidatePassword(informedPassword,passworServiceMock.Object);
     

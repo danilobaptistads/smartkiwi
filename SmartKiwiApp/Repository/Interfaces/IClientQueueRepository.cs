@@ -1,6 +1,6 @@
 using SmartKiwiApp.Models;
-namespace SmartKiwiApp.Repository;
 
+namespace SmartKiwiApp.Repository;
 public interface IClientQueueRepository
 {
     public Task Add(ClientQueue newClientQueue);

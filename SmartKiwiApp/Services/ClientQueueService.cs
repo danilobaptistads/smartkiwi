@@ -2,7 +2,6 @@ using SmartKiwiApp.Models;
 using SmartKiwiApp.Repository;
 
 namespace SmartKiwiApp.Services;
-
 public class ClientQueueService
 {
     private readonly IClientQueueRepository _clientQueueRepository;

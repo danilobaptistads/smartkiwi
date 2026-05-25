@@ -1,4 +1,5 @@
 using SmartKiwiApp.Models;
+
 namespace SmartKiwiApp.Services;
 public class AtendanteService
 {

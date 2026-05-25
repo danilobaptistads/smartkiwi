@@ -20,26 +20,26 @@ public class UserServiceUpdateTests
     [Fact]
     public async Task Deve_Chamar_Metodo_UpdateName()
     {
-        var currentUSer = new CleintQueue("Danilo", "da@hotmail.com", "!T12@45");
+        var currentUSer = new User("Danilo", "da@hotmail.com", "!T12@45");
         var IdCurrentUser = currentUSer.Id;
         _userRepositoryMock.Setup(x => x.GetUserById(IdCurrentUser)).ReturnsAsync(currentUSer);
-        _userRepositoryMock.Setup(x => x.UpdateName(It.IsAny<CleintQueue>(),"Dan")).Returns(Task.CompletedTask);
+        _userRepositoryMock.Setup(x => x.UpdateName(It.IsAny<User>(),"Dan")).Returns(Task.CompletedTask);
 
         await _userService.UpdateUserName(IdCurrentUser,"Dan");
         
-         _userRepositoryMock.Verify(x => x.UpdateName(It.IsAny<CleintQueue>(),"Dan"), Times.Once);
+         _userRepositoryMock.Verify(x => x.UpdateName(It.IsAny<User>(),"Dan"), Times.Once);
         
     }
     [Fact]
     public async Task Deve_Não_Chamar_Metodo_UpdateName_Se_Usuario_Não_Encontrado()
     {
-        var currentUSer = new CleintQueue("Danilo", "da@hotmail.com", "!T12@45");
+        var currentUSer = new User("Danilo", "da@hotmail.com", "!T12@45");
         var wrongId = Guid.NewGuid();
-        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((CleintQueue)null);
+        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((User)null);
  
         await Assert.ThrowsAsync<ArgumentException>(() => _userService.UpdateUserName(wrongId,"Dan"));
         
-        _userRepositoryMock.Verify(x => x.UpdateName(It.IsAny<CleintQueue>(),"Dan"), Times.Never);
+        _userRepositoryMock.Verify(x => x.UpdateName(It.IsAny<User>(),"Dan"), Times.Never);
         
     }
 
@@ -47,16 +47,16 @@ public class UserServiceUpdateTests
     public async Task Deve_Chamar_Metodo_UpdateEmail_Se_Senha_válida()
     {
         var validUserPassword = "!T12@45";
-        var currentUSer = new CleintQueue("Danilo", "da@hotmail.com", validUserPassword );
+        var currentUSer = new User("Danilo", "da@hotmail.com", validUserPassword );
         var IdCurrentUser = currentUSer.Id;
 
         _passwordServiceMock.Setup(x => x.ValidatePassword(validUserPassword,It.IsAny<string>())).Returns(true);
         _userRepositoryMock.Setup(x => x.GetUserById(IdCurrentUser)).ReturnsAsync(currentUSer);
-        _userRepositoryMock.Setup(x => x.UpdateEmail(It.IsAny<CleintQueue>(),"danilo@gmail.com")).Returns(Task.CompletedTask);
+        _userRepositoryMock.Setup(x => x.UpdateEmail(It.IsAny<User>(),"danilo@gmail.com")).Returns(Task.CompletedTask);
 
         await _userService.UpdateUserEmail(IdCurrentUser,validUserPassword,"danilo@gmail.com");
         
-         _userRepositoryMock.Verify(x => x.UpdateEmail(It.IsAny<CleintQueue>(),"danilo@gmail.com"), Times.Once);
+         _userRepositoryMock.Verify(x => x.UpdateEmail(It.IsAny<User>(),"danilo@gmail.com"), Times.Once);
         
     }
 
@@ -65,73 +65,73 @@ public class UserServiceUpdateTests
     {
         var validUserPassword = "!T12@45";
         var wrongUserPassword = "@daSilva123";
-        var currentUSer = new CleintQueue("Danilo", "da@hotmail.com", validUserPassword );
+        var currentUSer = new User("Danilo", "da@hotmail.com", validUserPassword );
         var IdCurrentUser = currentUSer.Id;
 
         _passwordServiceMock.Setup(x => x.ValidatePassword(wrongUserPassword,It.IsAny<string>())).Returns(false);
         _userRepositoryMock.Setup(x => x.GetUserById(IdCurrentUser)).ReturnsAsync(currentUSer);
-        _userRepositoryMock.Setup(x => x.UpdateEmail(It.IsAny<CleintQueue>(),"danilo@gmail.com")).Returns(Task.CompletedTask);
+        _userRepositoryMock.Setup(x => x.UpdateEmail(It.IsAny<User>(),"danilo@gmail.com")).Returns(Task.CompletedTask);
 
         await Assert.ThrowsAsync<ArgumentException>(() => _userService.UpdateUserEmail(IdCurrentUser,wrongUserPassword,"danilo@gmail.com"));
         
-         _userRepositoryMock.Verify(x => x.UpdateEmail(It.IsAny<CleintQueue>(),"danilo@gmail.com"), Times.Never);
+         _userRepositoryMock.Verify(x => x.UpdateEmail(It.IsAny<User>(),"danilo@gmail.com"), Times.Never);
         
     }
 
     [Fact]
     public async Task Deve_Chamar_Metodo_ChangeUserPassword_Quando_Senha_Correta()
     {
-        var currentUser = new CleintQueue("Danilo", "da@hotmail.com", "!T12@45");
+        var currentUser = new User("Danilo", "da@hotmail.com", "!T12@45");
         var informedPassword = "!T12@45";
         _userRepositoryMock.Setup(x => x.GetUserById(currentUser.Id)).ReturnsAsync(currentUser);
-        _userRepositoryMock.Setup(x => x.UpdatePassword(It.IsAny<CleintQueue>(),"NewP@ssW0rd", informedPassword, _passwordServiceMock.Object)).Returns(Task.CompletedTask);
+        _userRepositoryMock.Setup(x => x.UpdatePassword(It.IsAny<User>(),"NewP@ssW0rd", informedPassword, _passwordServiceMock.Object)).Returns(Task.CompletedTask);
         _passwordServiceMock.Setup(x => x.ValidatePassword(informedPassword,It.IsAny<string>())).Returns(true);
 
         _userService.UpdateUserPassword(currentUser.Id, "NewP@ssW0rd", informedPassword);
     
-        _userRepositoryMock.Verify(x => x.UpdatePassword(It.IsAny<CleintQueue>(),"NewP@ssW0rd", informedPassword, _passwordServiceMock.Object), Times.Once);
+        _userRepositoryMock.Verify(x => x.UpdatePassword(It.IsAny<User>(),"NewP@ssW0rd", informedPassword, _passwordServiceMock.Object), Times.Once);
     }
 
     [Fact]
     public async Task Deve_Não_Chamar_Metodo_ChangeUserPassword_Quando_Senha_Incorreta()
     {
-        var currentUser = new CleintQueue("Danilo", "da@hotmail.com", "!T12@45");
+        var currentUser = new User("Danilo", "da@hotmail.com", "!T12@45");
         var informedPassword = "wr0ngInfor3dP@ssword";
         _userRepositoryMock.Setup(x => x.GetUserById(currentUser.Id)).ReturnsAsync(currentUser);
-        _userRepositoryMock.Setup(x => x.UpdatePassword(It.IsAny<CleintQueue>(),"NewP@ssW0rd", informedPassword, _passwordServiceMock.Object)).Returns(Task.CompletedTask);
+        _userRepositoryMock.Setup(x => x.UpdatePassword(It.IsAny<User>(),"NewP@ssW0rd", informedPassword, _passwordServiceMock.Object)).Returns(Task.CompletedTask);
         _passwordServiceMock.Setup(x => x.ValidatePassword(informedPassword,It.IsAny<string>())).Returns(false);
 
          await Assert.ThrowsAsync<ArgumentException>(() => _userService.UpdateUserPassword(currentUser.Id, "NewP@ssW0rd", informedPassword));
     
-        _userRepositoryMock.Verify(x => x.UpdatePassword(It.IsAny<CleintQueue>(),"NewP@ssW0rd", informedPassword, _passwordServiceMock.Object), Times.Never);
+        _userRepositoryMock.Verify(x => x.UpdatePassword(It.IsAny<User>(),"NewP@ssW0rd", informedPassword, _passwordServiceMock.Object), Times.Never);
     }
 
     [Fact]
     public async Task Deve_Chama_Metodo_Deletar_Usuario_Quando_Senha_Correta()
     {
-        var currentUser = new CleintQueue("Danilo", "da@hotmail.com", "infor3dP@sswordCorrect");
+        var currentUser = new User("Danilo", "da@hotmail.com", "infor3dP@sswordCorrect");
         var informedPassword = "infor3dP@sswordCorrect";
         _userRepositoryMock.Setup(x => x.GetUserById(currentUser.Id)).ReturnsAsync(currentUser);
-        _userRepositoryMock.Setup(x => x.DeleteUser(It.IsAny<CleintQueue>())).Returns(Task.CompletedTask);
+        _userRepositoryMock.Setup(x => x.DeleteUser(It.IsAny<User>())).Returns(Task.CompletedTask);
         _passwordServiceMock.Setup(x => x.ValidatePassword(informedPassword,It.IsAny<string>())).Returns(true);
     
         _userService.DeleteCurrentUser(currentUser.Id, informedPassword);
     
-        _userRepositoryMock.Verify(x => x.DeleteUser(It.IsAny<CleintQueue>()));
+        _userRepositoryMock.Verify(x => x.DeleteUser(It.IsAny<User>()));
     }
 
     [Fact]
     public async Task Deve_Não_Chamar_Metodo_DeleteUSer_Quando_Senha_Incorreta()
     {
-        var currentUser = new CleintQueue("Danilo", "da@hotmail.com", "!T12@45");
+        var currentUser = new User("Danilo", "da@hotmail.com", "!T12@45");
         var informedPassword = "wr0ngInfor3dP@ssword";
         _userRepositoryMock.Setup(x => x.GetUserById(currentUser.Id)).ReturnsAsync(currentUser);
-        _userRepositoryMock.Setup(x => x.DeleteUser(It.IsAny<CleintQueue>())).Returns(Task.CompletedTask);
+        _userRepositoryMock.Setup(x => x.DeleteUser(It.IsAny<User>())).Returns(Task.CompletedTask);
         _passwordServiceMock.Setup(x => x.ValidatePassword(informedPassword,It.IsAny<string>())).Returns(false);
 
          await Assert.ThrowsAsync<ArgumentException>(() => _userService.DeleteCurrentUser(currentUser.Id, informedPassword));
 
-        _userRepositoryMock.Verify(x => x.DeleteUser(It.IsAny<CleintQueue>()), Times.Never);
+        _userRepositoryMock.Verify(x => x.DeleteUser(It.IsAny<User>()), Times.Never);
     }
 
     [Fact]
@@ -140,11 +140,11 @@ public class UserServiceUpdateTests
         var wrongId = Guid.NewGuid();
         var validUserPassword = "!T12@45";
 
-        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((CleintQueue)null);
+        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((User)null);
 
         await Assert.ThrowsAsync<ArgumentException>(() => _userService.UpdateUserEmail(wrongId, validUserPassword, "novo@email.com"));
 
-        _userRepositoryMock.Verify(x => x.UpdateEmail(It.IsAny<CleintQueue>(), It.IsAny<string>()), Times.Never);
+        _userRepositoryMock.Verify(x => x.UpdateEmail(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
     }
 
     [Fact]
@@ -153,11 +153,11 @@ public class UserServiceUpdateTests
         var wrongId = Guid.NewGuid();
         var informedPassword = "!T12@45";
 
-        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((CleintQueue)null);
+        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((User)null);
 
         await Assert.ThrowsAsync<ArgumentException>(() => _userService.UpdateUserPassword(wrongId, "NewP@ssW0rd", informedPassword));
 
-        _userRepositoryMock.Verify(x => x.UpdatePassword(It.IsAny<CleintQueue>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IPasswordService>()), Times.Never);
+        _userRepositoryMock.Verify(x => x.UpdatePassword(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IPasswordService>()), Times.Never);
     }
 
     [Fact]
@@ -166,10 +166,10 @@ public class UserServiceUpdateTests
         var wrongId = Guid.NewGuid();
         var informedPassword = "!T12@45";
 
-        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((CleintQueue)null);
+        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((User)null);
 
         await Assert.ThrowsAsync<ArgumentException>(() => _userService.DeleteCurrentUser(wrongId, informedPassword));
 
-        _userRepositoryMock.Verify(x => x.DeleteUser(It.IsAny<CleintQueue>()), Times.Never);
+        _userRepositoryMock.Verify(x => x.DeleteUser(It.IsAny<User>()), Times.Never);
     }
 }

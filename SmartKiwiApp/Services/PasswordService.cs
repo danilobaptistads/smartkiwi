@@ -1,7 +1,6 @@
 using System.Text.RegularExpressions;
 
 namespace SmartKiwiApp.Services;
-
 public class PasswordService:IPasswordService
 {
     private readonly IHashService _hashService;

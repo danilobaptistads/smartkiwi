@@ -25,14 +25,14 @@ public class UserServiceCreateTests
         var userHashedPassword = "OTk2Njk5";
         
         
-        _userRepositoryMock.Setup(x => x.Add(It.IsAny<CleintQueue>())).Returns(Task.CompletedTask);
-        _userRepositoryMock.Setup(x => x.GetUserByEmail("dan@hotmail.com")).ReturnsAsync((CleintQueue)null);
+        _userRepositoryMock.Setup(x => x.Add(It.IsAny<User>())).Returns(Task.CompletedTask);
+        _userRepositoryMock.Setup(x => x.GetUserByEmail("dan@hotmail.com")).ReturnsAsync((User)null);
         _passwordServiceMock.Setup(x => x.ProcssesHashNewPassword(userRawPassword)).Returns(userHashedPassword);
         
          await userService.CreateNewUSer("danilo", "dan@hotmail.com","996699");
         
         _passwordServiceMock.Verify(x => x.ProcssesHashNewPassword(userRawPassword), Times.Once);
-        _userRepositoryMock.Verify(x => x.Add(It.IsAny<CleintQueue>()), Times.Once);
+        _userRepositoryMock.Verify(x => x.Add(It.IsAny<User>()), Times.Once);
         _userRepositoryMock.Verify(x => x.GetUserByEmail("dan@hotmail.com"), Times.Once);
     
     }
@@ -43,14 +43,14 @@ public class UserServiceCreateTests
         var NewUserRawPassword = "996699";
         var NewUserHashedPAssword = "OTk2Njk5";
         var AlreadyRegisteredEmail = "dan@hotmail.com";
-        var userDummy = new CleintQueue("dummy", "dan@hotmail.com", "anyhash");
+        var userDummy = new User("dummy", "dan@hotmail.com", "anyhash");
 
         _userRepositoryMock.Setup(x => x.GetUserByEmail(AlreadyRegisteredEmail)).ReturnsAsync(userDummy);
         
         var assertException = await Assert.ThrowsAsync<InvalidOperationException>(()=> userService.CreateNewUSer("danilo", AlreadyRegisteredEmail,"996699"));
         Assert.Equal("Não foi possível realizar o cadastro", assertException.Message);
 
-        _userRepositoryMock.Verify(x => x.Add(It.IsAny<CleintQueue>()), Times.Never);
+        _userRepositoryMock.Verify(x => x.Add(It.IsAny<User>()), Times.Never);
     }
 
 

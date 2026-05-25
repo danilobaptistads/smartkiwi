@@ -1,5 +1,4 @@
 namespace SmartKiwiApp.Models;
-
 public class Call
 {
     public Guid Id { get; private set; }
