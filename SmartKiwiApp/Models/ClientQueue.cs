@@ -2,22 +2,27 @@ namespace SmartKiwiApp.Models;
 public class ClientQueue
 {
     public int currentPriority;
+    public int LastTicktNumber;
     public DateTime lastCallTime;
     public Guid Id { get; private set; }
     public string Name { get; private set;}
     public Guid WonerId { get; private set; }
     public int Priority { get; private set; }
+    public string? Prefix { get; private set; }
+
     private readonly Queue<Client> clientQueue;
     protected ClientQueue() { }
-public ClientQueue(string name, Guid wonerId,int priority)
+    public ClientQueue(string name, Guid wonerId,int priority , string? prefix = null)
     {
-        Id = Guid.NewGuid();
         Name = name;
-        Priority = priority;
+        Prefix = prefix;
         WonerId = wonerId;
+        Priority = priority;
+        Id = Guid.NewGuid();
+        LastTicktNumber = 0;
         currentPriority = priority;
-        clientQueue = new Queue<Client>();
         lastCallTime = DateTime.MinValue;
+        clientQueue = new Queue<Client>();
        
     }
 
@@ -42,5 +47,8 @@ public ClientQueue(string name, Guid wonerId,int priority)
         }
         return true;
     }
-
+    public void changePrefix(string? newPrefix = null)
+    {
+        Prefix = newPrefix;
+    }
 }

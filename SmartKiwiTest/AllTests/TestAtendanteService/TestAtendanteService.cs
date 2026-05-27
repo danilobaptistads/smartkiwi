@@ -1,7 +1,9 @@
-namespace SmartKiwiTest;
+using SmartKiwiApp.Repository;
 using SmartKiwiApp.Models;
 using SmartKiwiApp.Services;
+using Moq;
 
+namespace SmartKiwiTest;
 public class TesteAtendanteService
 {
     private readonly QueueEngine queueEngine;
@@ -9,14 +11,16 @@ public class TesteAtendanteService
     private readonly ClientQueue queueA;
     private int maxWaiteTimeMinutes;
     private List<ClientQueue> queueList;
+    private Mock<IClientRepository> _clientRepositoryMock;
     public TesteAtendanteService()
     {
         queueA = new ClientQueue("A", new Guid(),3);
         queueList = new(){queueA};
         maxWaiteTimeMinutes = 10;
         queueEngine = new QueueEngine(maxWaiteTimeMinutes,queueList);
-        atendanteService = new AtendanteService(queueEngine);
-        queueA.Enqueue(new Client("A_1", 214));
+        _clientRepositoryMock = new Mock<IClientRepository>();
+        atendanteService = new AtendanteService(queueEngine, _clientRepositoryMock.Object);
+        queueA.Enqueue(new Client("TICKT", "A_1"));
     }
 
     [Fact]
@@ -37,9 +41,22 @@ public class TesteAtendanteService
     {
         var atendante = new Atendante("Atendente",5);
         
-        var newCall= atendanteService.ProcessNextCall(atendante);
-        newCall= atendanteService.ProcessNextCall(atendante);
-        Assert.Null(newCall);
+        atendanteService.ProcessNextCall(atendante);
+        var secondCall= atendanteService.ProcessNextCall(atendante);
+        Assert.Null(secondCall);
       
     }
+
+    [Fact]
+    public void Deve_Remover_Client_Do_Banco_Apos_Chamada()
+    {
+        var atendante = new Atendante("Atendente",5);
+        
+        atendanteService.ProcessNextCall(atendante);
+        _clientRepositoryMock.Setup(x => x.RemoveClient(It.IsAny<Client>())).Returns(Task.CompletedTask);
+        
+        _clientRepositoryMock.Verify(x => x.RemoveClient(It.IsAny<Client>()), Times.Once);
+      
+    }
+
 }

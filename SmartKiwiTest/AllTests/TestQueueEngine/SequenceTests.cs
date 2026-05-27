@@ -22,12 +22,12 @@ public class SequenceTests
     public void Deve_Chamar_Na_Sasquencia_ABABAC_Em_Um_Ciclo()
     {
         var callsList = new List<string>();
-        queueA.Enqueue(new Client("A_1", 1));
-        queueA.Enqueue(new Client("A_2", 1));
-        queueA.Enqueue(new Client("A_3", 1));
-        queueB.Enqueue(new Client("B_1", 1));
-        queueB.Enqueue(new Client("B_2", 1));
-        queueC.Enqueue(new Client("C_1", 1));
+        queueA.Enqueue(new Client("TICKET", "A_1"));
+        queueA.Enqueue(new Client("TICKET", "A_2"));
+        queueA.Enqueue(new Client("TICKET", "A_3"));
+        queueB.Enqueue(new Client("TICKET", "B_1"));
+        queueB.Enqueue(new Client("TICKET", "B_2"));
+        queueC.Enqueue(new Client("TICKET", "C_1"));
         queueList.Add(queueA);
         queueList.Add(queueB);
         queueList.Add(queueC);
@@ -55,18 +55,18 @@ public class SequenceTests
     public void Deve_Chamar_Na_Sasquencia_ABABACABABAC_Em_2_Ciclos()
     {
         var callsList = new List<string>();
-        queueA.Enqueue(new Client("A_1", 1));
-        queueA.Enqueue(new Client("A_2", 1));
-        queueA.Enqueue(new Client("A_3", 1));
-        queueA.Enqueue(new Client("A_4", 1));
-        queueA.Enqueue(new Client("A_5", 1));
-        queueA.Enqueue(new Client("A_6", 1));
-        queueB.Enqueue(new Client("B_1", 1));
-        queueB.Enqueue(new Client("B_2", 1));
-        queueB.Enqueue(new Client("B_3", 1));
-        queueB.Enqueue(new Client("B_4", 1));
-        queueC.Enqueue(new Client("C_1", 1));
-        queueC.Enqueue(new Client("C_2", 1));
+        queueA.Enqueue(new Client("TICKT","A_1"));
+        queueA.Enqueue(new Client("TICKT","A_2"));
+        queueA.Enqueue(new Client("TICKT","A_3"));
+        queueA.Enqueue(new Client("TICKT","A_4"));
+        queueA.Enqueue(new Client("TICKT","A_5"));
+        queueA.Enqueue(new Client("TICKT","A_6"));
+        queueB.Enqueue(new Client("TICKT","B_1"));
+        queueB.Enqueue(new Client("TICKT","B_2"));
+        queueB.Enqueue(new Client("TICKT","B_3"));
+        queueB.Enqueue(new Client("TICKT","B_4"));
+        queueC.Enqueue(new Client("TICKT","C_1"));
+        queueC.Enqueue(new Client("TICKT","C_2"));
         queueList.Add(queueA);
         queueList.Add(queueB);
         queueList.Add(queueC);
@@ -110,9 +110,9 @@ public class SequenceTests
         queueList.Add(queueC);
         queueEngine = new QueueEngine(maxWaiteTime,queueList);
         queueEngine. InicializeLastcallTime();
-        queueA.Enqueue(new Client("A_1", 1));
-        queueB.Enqueue(new Client("B_1", 1));
-        queueC.Enqueue(new Client("C_1", 1));
+        queueA.Enqueue(new Client("TICKET","A_1"));
+        queueB.Enqueue(new Client("TICKET","B_1"));
+        queueC.Enqueue(new Client("TICKET","C_1"));
             
         while ((clientCalled = queueEngine.ProcessClient()) != null)
         {
@@ -130,10 +130,10 @@ public class SequenceTests
         queueEngine = new QueueEngine(maxWaiteTime,queueList);
 
         queueEngine. InicializeLastcallTime();
-        queueA.Enqueue(new Client("A_1", 1));
-        queueA.Enqueue(new Client("A_2", 1));
-        queueA.Enqueue(new Client("A_3", 1));
-        queueA.Enqueue(new Client("A_4", 1));
+        queueA.Enqueue(new Client("TIKET", "A_1"));
+        queueA.Enqueue(new Client("TIKET", "A_2"));
+        queueA.Enqueue(new Client("TIKET", "A_3"));
+        queueA.Enqueue(new Client("TIKET", "A_4"));
 
         while ((clientCalled = queueEngine.ProcessClient()) != null)
         {

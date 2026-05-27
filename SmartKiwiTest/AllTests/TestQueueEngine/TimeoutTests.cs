@@ -27,9 +27,9 @@ public class TimeoutTests
         queueList.Add(queueC);
         queueEngine = new QueueEngine(maxWaiteTime,queueList);
         queueEngine.InicializeLastcallTime();
-        queueA.Enqueue(new Client("A_1", 1));
-        queueB.Enqueue(new Client("B_1", 1));
-        queueC.Enqueue(new Client("C_1", 1));
+        queueA.Enqueue(new Client("TICKT", "A_1"));
+        queueB.Enqueue(new Client("TICKT", "B_1"));
+        queueC.Enqueue(new Client("TICKT", "C_1"));
 
         var timeLapsedTenMinutes = DateTime.Now.AddMinutes(-11);
         if (aInTimeout)
@@ -71,15 +71,15 @@ public class TimeoutTests
         queueC.lastCallTime = timeLapsedTenMinutes;
         if (aHasClients)
         {
-        queueA.Enqueue(new Client("A_1", 1));
+        queueA.Enqueue(new Client("TICKT", "A_1"));
         }
         if (bHasClients)
         {
-        queueB.Enqueue(new Client("B_1", 1));
+        queueB.Enqueue(new Client("TICKT", "B_1"));
         }
         if (cHasClients)
         {
-        queueC.Enqueue(new Client("C_1", 1));
+        queueC.Enqueue(new Client("TICKT", "C_1"));
         }
         
         var clientCalled = queueEngine.ProcessClient();
