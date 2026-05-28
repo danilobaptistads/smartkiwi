@@ -73,7 +73,6 @@ public class ClientQueueService
         await _clientQueueRepository.UpdateQueuePrefix(queueToUpdate, newPrefix);
     }
 
-
     public async Task DeleteQueue(Guid queueId)
     {
 
