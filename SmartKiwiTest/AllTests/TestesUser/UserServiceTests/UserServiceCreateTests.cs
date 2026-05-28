@@ -26,7 +26,7 @@ public class UserServiceCreateTests
         
         
         _userRepositoryMock.Setup(x => x.Add(It.IsAny<User>())).Returns(Task.CompletedTask);
-        _userRepositoryMock.Setup(x => x.GetUserByEmail("dan@hotmail.com")).ReturnsAsync((User)null);
+        _userRepositoryMock.Setup(x => x.GetUserByEmail("dan@hotmail.com")).ReturnsAsync((User?)null);
         _passwordServiceMock.Setup(x => x.ProcssesHashNewPassword(userRawPassword)).Returns(userHashedPassword);
         
          await userService.CreateNewUSer("danilo", "dan@hotmail.com","996699");
@@ -40,8 +40,7 @@ public class UserServiceCreateTests
     [Fact]
     public async Task Deve_Não_Chammar_Metodo_Add_Quando_Email_Já_Cadastrado()
     {      
-        var NewUserRawPassword = "996699";
-        var NewUserHashedPAssword = "OTk2Njk5";
+
         var AlreadyRegisteredEmail = "dan@hotmail.com";
         var userDummy = new User("dummy", "dan@hotmail.com", "anyhash");
 

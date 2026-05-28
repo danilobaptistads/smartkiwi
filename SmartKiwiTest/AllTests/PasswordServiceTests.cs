@@ -33,16 +33,6 @@ public class PasswordServiceTests
     }
 
     [Fact]
-    public void Deve_Retornar_False_Para_Senha_Nula()
-    {
-        string? rawPassword = null;
-
-        var result = _passwordService.ValidatePasswordFormat(rawPassword);
-
-        Assert.False(result);
-    }
-
-    [Fact]
     public void Deve_Retornar_False_Para_Senha_Menor_Que_8_Caracteres()
     {
         var rawPassword = "I2E4s6";

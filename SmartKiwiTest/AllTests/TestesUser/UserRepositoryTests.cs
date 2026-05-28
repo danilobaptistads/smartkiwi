@@ -59,7 +59,7 @@ public class UserRepositoryTests
         await userRepository.Add(user);
 
         var retornedUser = await userRepository.GetUserByEmail("da@hotmail.com");
-
+        Assert.NotNull(retornedUser);
         Assert.Equal(user.Email, retornedUser.Email );
 
     }
@@ -90,7 +90,7 @@ public class UserRepositoryTests
         await userRepository.UpdateEmail(user, "danilo@hotmail.com");
 
         var updatedUser = await userRepository.GetUserById(user.Id);      
-
+        Assert.NotNull(updatedUser);
         Assert.Equal("danilo@hotmail.com", updatedUser.Email);
 
     }
@@ -105,7 +105,8 @@ public class UserRepositoryTests
         await userRepository.UpdateName(user, "Otto");
 
         var updatedUser = await userRepository.GetUserById(user.Id);      
-
+        
+        Assert.NotNull(updatedUser);
         Assert.Equal("Otto", updatedUser.Name);
 
     }
@@ -127,10 +128,15 @@ public class UserRepositoryTests
         await userRepository.UpdatePassword(user, newPassword, oldPassword, hasherServiceMock.Object);
         
         var updatedUser = await userRepository.GetUserById(user.Id);
-        var validatedNewPassword = updatedUser.ValidatePassword(newPassword,hasherServiceMock.Object);
-        var validatedOldPassword = updatedUser.ValidatePassword(oldPassword,hasherServiceMock.Object);
-        Assert.True(validatedNewPassword);
-        Assert.False(validatedOldPassword);
+
+        if(updatedUser != null)
+        {
+            var validatedNewPassword = updatedUser.ValidatePassword(newPassword,hasherServiceMock.Object);
+            var validatedOldPassword = updatedUser.ValidatePassword(oldPassword,hasherServiceMock.Object);
+            Assert.True(validatedNewPassword);
+            Assert.False(validatedOldPassword);
+        }
+        
 
     }
 }

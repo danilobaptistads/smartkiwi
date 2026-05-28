@@ -54,8 +54,7 @@ public class UserServiceAutenticationTests
         var informedEmail = "Wrong@Email.com";
         var userDummy = new User("danilo","danilo@hotmail.com", "C0rrectP@ssWord");
         _tokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<User>())).Returns("MokcTokenTeste");
-        //_passwordServiceMock.Setup(x => x.ValidatePassword(informedPassword,It.IsAny<string>())).Returns(false);
-        _userRepositoryMock.Setup(x => x.GetUserByEmail(informedEmail)).ReturnsAsync((User)null);
+        _userRepositoryMock.Setup(x => x.GetUserByEmail(informedEmail)).ReturnsAsync((User?)null);
         
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _userService.AuthenticateUser(informedEmail, informedPassword));
         _tokenServiceMock.Verify(x => x.GenerateToken(It.IsAny<User>()),Times.Never);

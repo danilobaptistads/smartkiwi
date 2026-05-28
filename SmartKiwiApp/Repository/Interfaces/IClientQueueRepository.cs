@@ -9,6 +9,7 @@ public interface IClientQueueRepository
     public Task<IEnumerable<ClientQueue>> GetQueueByUserId(Guid woNerId);
     public Task UpdateQueueName(ClientQueue queueToUpdate, string newName);
     public Task UpdateQueuePriority(ClientQueue queueToUpdate, int priority);
+    public Task UpdateQueuePrefix(ClientQueue queueToUpdate, string prefix);
     public Task DeleteQueue(ClientQueue queueToDelete);
 
 }

@@ -30,7 +30,7 @@ public class TesteAtendanteService
         
         var newCall= atendanteService.ProcessNextCall(atendante);
         
-        Assert.Equal("A_1",newCall.ClientName);
+        Assert.Equal("A_1",newCall!.ClientName);
         Assert.Equal(atendante.Name, newCall.AtendanteName);
         Assert.Equal(atendante.TicketWindow, newCall.TicketWindowNumber);
         

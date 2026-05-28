@@ -3,7 +3,7 @@ using SmartKiwiApp.Models;
 public class QueueEngine
 {  
     int sumOfPriotitys;
-    ClientQueue lastProcessedQueue;
+    ClientQueue? lastProcessedQueue;
     int successfullyProcessedQueues;
     List<ClientQueue> QueueList {get; set;}
     public int MaxWaiteMinutes { get; set; }
@@ -15,14 +15,8 @@ public class QueueEngine
         sumOfPriotitys = SumOfPrioritys();
 
     }
-    // public void AddQueue(ClientQueue newQueue)
-    // {
-    //     QueueList.Add(newQueue);
-    //     sumOfPriotitys = SumOfPrioritys();
-        
-    // }
-    
-    public Client ProcessClient()
+
+    public Client? ProcessClient()
     {
         var currentQueue = SelectNextQueue();
         if(currentQueue != null && !currentQueue.IsEmpty())
@@ -35,7 +29,7 @@ public class QueueEngine
         return null;
 
     }
-    public ClientQueue SelectNextQueue()
+    public ClientQueue? SelectNextQueue()
     {
 
         if(successfullyProcessedQueues >= sumOfPriotitys)
@@ -100,7 +94,7 @@ public class QueueEngine
         lastProcessedQueue = queue;
         queue.lastCallTime = DateTime.Now;
     }
-    internal ClientQueue HasQueueInTimeout()
+    internal ClientQueue? HasQueueInTimeout()
     {
         foreach(ClientQueue queue in QueueList)
         {

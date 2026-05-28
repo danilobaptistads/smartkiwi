@@ -10,13 +10,12 @@ public class EmptyQueueTests
     private  List<ClientQueue> queueList;
     public EmptyQueueTests()
     {
-        
+        queueList = new();
+        maxWaiteTime = 10;
         queueA = new ClientQueue("A", new Guid(), 3);
         queueB = new ClientQueue("B", new Guid(), 2);
         queueC = new ClientQueue("C", new Guid(), 1);
-
-        queueList = new();
-        maxWaiteTime = 10;
+        queueEngine = new QueueEngine(maxWaiteTime,queueList);
     }
 
     [Fact]
@@ -28,8 +27,8 @@ public class EmptyQueueTests
         queueList.Add(queueA);
         queueList.Add(queueB);
         queueList.Add(queueC);
-        queueEngine = new QueueEngine(maxWaiteTime,queueList);
-        Client clientCalled;
+        
+        Client? clientCalled;
         queueEngine. InicializeLastcallTime();
 
         var callsList = new List<string>();
@@ -38,7 +37,10 @@ public class EmptyQueueTests
          for(int i=0; i<3; i++)
             {
                 clientCalled = queueEngine.ProcessClient();
-                callsList.Add(clientCalled.Name);
+                if(clientCalled != null)
+                {
+                    callsList.Add(clientCalled.Name ?? string.Empty);
+                }
             }
 
         Assert.Equal(expected, callsList);
@@ -50,7 +52,7 @@ public class EmptyQueueTests
         queueList.Add(queueA);
         queueList.Add(queueB);
         queueList.Add(queueC);
-        queueEngine = new QueueEngine(maxWaiteTime,queueList);
+     //   queueEngine = new QueueEngine(maxWaiteTime,queueList);
 
         var clientCalled = queueEngine.ProcessClient();
         
@@ -86,14 +88,15 @@ public class EmptyQueueTests
     queueList.Add(queueA);
     queueList.Add(queueB);
     queueList.Add(queueC);
-    queueEngine = new QueueEngine(maxWaiteTime,queueList);
+    //queueEngine = new QueueEngine(maxWaiteTime,queueList);
     queueEngine.InicializeLastcallTime();
 
-    Client clientCalled;
+    Client? clientCalled;
 
     while ((clientCalled = queueEngine.ProcessClient()) != null)
     {
-        callsList.Add(clientCalled.Name);
+        
+        callsList.Add(clientCalled.Name ?? string.Empty);
     }
 
     Assert.Equal(expected, callsList);
@@ -106,11 +109,11 @@ public class EmptyQueueTests
     public void Deve_Chamar_O_Cliente_Ao_Adicionar_Em_Fila_Vazia(bool addInA, bool addInB,bool AddInC, string[] expected)
     {
         
-        Client clientCalled;
+        Client? clientCalled;
         queueList.Add(queueA);
         queueList.Add(queueB);
         queueList.Add(queueC);
-        queueEngine = new QueueEngine(maxWaiteTime,queueList);
+        //queueEngine = new QueueEngine(maxWaiteTime,queueList);
         queueEngine.InicializeLastcallTime();
         var callsList = new List<string>();
         
@@ -121,7 +124,7 @@ public class EmptyQueueTests
         }
         else
         {
-            callsList.Add(clientCalled.Name);
+            callsList.Add(clientCalled.Name ?? string.Empty);
         }
        
 
@@ -143,7 +146,11 @@ public class EmptyQueueTests
         }
         
         clientCalled = queueEngine.ProcessClient();
-        callsList.Add(clientCalled.Name);
+        if(clientCalled != null)
+        {
+            callsList.Add(clientCalled.Name ?? string.Empty);
+      
+        }
 
         Assert.Equal(expected, callsList);
     }

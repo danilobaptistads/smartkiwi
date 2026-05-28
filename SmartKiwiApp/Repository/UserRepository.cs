@@ -28,7 +28,7 @@ public class UserRepository: IUserRepository
         
     }
 
-    public async Task<User> GetUserByEmail(string userEmail)
+    public async Task<User?> GetUserByEmail(string userEmail)
     {
         var returnedUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
         if(returnedUser == null)
@@ -39,7 +39,7 @@ public class UserRepository: IUserRepository
         return returnedUser;
     }
 
-    public async Task<User> GetUserById(Guid Id)
+    public async Task<User?> GetUserById(Guid Id)
     {
         var returnedUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == Id);
         if(returnedUser == null)

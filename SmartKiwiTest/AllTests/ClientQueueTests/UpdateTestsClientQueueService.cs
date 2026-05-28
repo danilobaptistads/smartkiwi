@@ -96,4 +96,15 @@ public class UpdateTestsClientQueueService
 
         _clientQueueRepositoryMock.Verify(x => x.DeleteQueue(It.IsAny<ClientQueue>()), Times.Never);
     }
+
+    [Fact]
+    public void Deve_Alterar_Prefixo_Da_Fila()
+    {
+        var queue = new ClientQueue("FilaTeste", _wonerId, 1, "ABC");
+
+        queue.changePrefix("DEF");
+
+        Assert.Equal("DEF", queue.Prefix);
+    }
+
 }

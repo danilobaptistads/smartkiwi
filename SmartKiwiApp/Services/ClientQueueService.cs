@@ -62,6 +62,18 @@ public class ClientQueueService
         await _clientQueueRepository.UpdateQueuePriority(queueToUpdate, newPriority);
     }
 
+    public async Task UpdateQueuePrefix(Guid queueId, string newPrefix)
+    {
+
+        var queueToUpdate = await _clientQueueRepository.GetQueueById(queueId);
+        if(queueToUpdate == null)
+        {
+            throw new ArgumentException("Não foi possivel localizar a fila");
+        }
+        await _clientQueueRepository.UpdateQueuePrefix(queueToUpdate, newPrefix);
+    }
+
+
     public async Task DeleteQueue(Guid queueId)
     {
 

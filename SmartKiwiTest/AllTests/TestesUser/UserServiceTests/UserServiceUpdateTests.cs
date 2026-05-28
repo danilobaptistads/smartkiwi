@@ -35,7 +35,7 @@ public class UserServiceUpdateTests
     {
         var currentUSer = new User("Danilo", "da@hotmail.com", "!T12@45");
         var wrongId = Guid.NewGuid();
-        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((User)null);
+        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((User?)null);
  
         await Assert.ThrowsAsync<ArgumentException>(() => _userService.UpdateUserName(wrongId,"Dan"));
         
@@ -87,7 +87,7 @@ public class UserServiceUpdateTests
         _userRepositoryMock.Setup(x => x.UpdatePassword(It.IsAny<User>(),"NewP@ssW0rd", informedPassword, _passwordServiceMock.Object)).Returns(Task.CompletedTask);
         _passwordServiceMock.Setup(x => x.ValidatePassword(informedPassword,It.IsAny<string>())).Returns(true);
 
-        _userService.UpdateUserPassword(currentUser.Id, "NewP@ssW0rd", informedPassword);
+        await _userService.UpdateUserPassword(currentUser.Id, "NewP@ssW0rd", informedPassword);
     
         _userRepositoryMock.Verify(x => x.UpdatePassword(It.IsAny<User>(),"NewP@ssW0rd", informedPassword, _passwordServiceMock.Object), Times.Once);
     }
@@ -115,7 +115,7 @@ public class UserServiceUpdateTests
         _userRepositoryMock.Setup(x => x.DeleteUser(It.IsAny<User>())).Returns(Task.CompletedTask);
         _passwordServiceMock.Setup(x => x.ValidatePassword(informedPassword,It.IsAny<string>())).Returns(true);
     
-        _userService.DeleteCurrentUser(currentUser.Id, informedPassword);
+        await _userService.DeleteCurrentUser(currentUser.Id, informedPassword);
     
         _userRepositoryMock.Verify(x => x.DeleteUser(It.IsAny<User>()));
     }
@@ -140,7 +140,7 @@ public class UserServiceUpdateTests
         var wrongId = Guid.NewGuid();
         var validUserPassword = "!T12@45";
 
-        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((User)null);
+        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((User?)null);
 
         await Assert.ThrowsAsync<ArgumentException>(() => _userService.UpdateUserEmail(wrongId, validUserPassword, "novo@email.com"));
 
@@ -153,7 +153,7 @@ public class UserServiceUpdateTests
         var wrongId = Guid.NewGuid();
         var informedPassword = "!T12@45";
 
-        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((User)null);
+        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((User?)null);
 
         await Assert.ThrowsAsync<ArgumentException>(() => _userService.UpdateUserPassword(wrongId, "NewP@ssW0rd", informedPassword));
 
@@ -166,7 +166,7 @@ public class UserServiceUpdateTests
         var wrongId = Guid.NewGuid();
         var informedPassword = "!T12@45";
 
-        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((User)null);
+        _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((User?)null);
 
         await Assert.ThrowsAsync<ArgumentException>(() => _userService.DeleteCurrentUser(wrongId, informedPassword));
 

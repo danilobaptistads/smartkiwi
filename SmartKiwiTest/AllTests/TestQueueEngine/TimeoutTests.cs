@@ -15,6 +15,7 @@ public class TimeoutTests
         queueC = new ClientQueue("C", new Guid(), 2);
         queueList = new();
         maxWaiteTime = 10;
+        queueEngine = new QueueEngine(maxWaiteTime,queueList);
     }
     [Theory]
     [InlineData(true,false,false,"A_1")]
@@ -25,7 +26,7 @@ public class TimeoutTests
         queueList.Add(queueA);
         queueList.Add(queueB);
         queueList.Add(queueC);
-        queueEngine = new QueueEngine(maxWaiteTime,queueList);
+        
         queueEngine.InicializeLastcallTime();
         queueA.Enqueue(new Client("TICKT", "A_1"));
         queueB.Enqueue(new Client("TICKT", "B_1"));
@@ -49,7 +50,7 @@ public class TimeoutTests
         
 
         var result = queueEngine.ProcessClient();
-
+        Assert.NotNull(result);
         Assert.Equal(expectedQueue, result.Name);
         
     }
@@ -63,7 +64,7 @@ public class TimeoutTests
         queueList.Add(queueA);
         queueList.Add(queueB);
         queueList.Add(queueC);
-        queueEngine = new QueueEngine(maxWaiteTime,queueList);
+        //queueEngine = new QueueEngine(maxWaiteTime,queueList);
         queueEngine.InicializeLastcallTime();
         var timeLapsedTenMinutes = DateTime.Now.AddMinutes(-11);
         queueA.lastCallTime = timeLapsedTenMinutes;
@@ -83,6 +84,7 @@ public class TimeoutTests
         }
         
         var clientCalled = queueEngine.ProcessClient();
+        Assert.NotNull(clientCalled);
         Assert.Equal(expectedQueue, clientCalled.Name);
         
     }

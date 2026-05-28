@@ -13,9 +13,9 @@ public class SequenceTests
         queueA = new ClientQueue("A", new Guid(), 3);
         queueB = new ClientQueue("B", new Guid(), 2);
         queueC = new ClientQueue("C", new Guid(), 1);
-  
         queueList = new();
         maxWaiteTime = 10;
+        queueEngine = new QueueEngine(maxWaiteTime,queueList);
     }
 
     [Fact]
@@ -31,13 +31,16 @@ public class SequenceTests
         queueList.Add(queueA);
         queueList.Add(queueB);
         queueList.Add(queueC);
-        queueEngine = new QueueEngine(maxWaiteTime,queueList);
+       // queueEngine = new QueueEngine(maxWaiteTime,queueList);
         queueEngine. InicializeLastcallTime();
 
         for (int i = 0; i < 6; i++)
         {
             var clientCalled = queueEngine.ProcessClient();
-            callsList.Add(clientCalled.Name);
+            if(clientCalled != null)
+            {
+            callsList.Add(clientCalled.Name ?? string.Empty);
+            }
         }
 
         Assert.Collection(
@@ -76,7 +79,11 @@ public class SequenceTests
         for (int i = 0; i < 12; i++)
         {
             var ClientCalled = queueEngine.ProcessClient();
-            callsList.Add(ClientCalled.Name);
+            if(ClientCalled != null)
+            {
+                callsList.Add(ClientCalled.Name ?? string.Empty);
+            }
+                
         }
 
         Assert.Collection(
@@ -99,7 +106,7 @@ public class SequenceTests
     [Fact]
     public void Deve_Chamar_Uma_vez_Cada_Quando_Prioridades_Iguais()
     {
-        Client clientCalled;
+        Client? clientCalled;
         var expected = new string[]{"A_1","B_1","C_1"};
         var callsList = new List<string>();
         queueA.SetPriority(1);
@@ -116,18 +123,18 @@ public class SequenceTests
             
         while ((clientCalled = queueEngine.ProcessClient()) != null)
         {
-            callsList.Add(clientCalled.Name);
+            callsList.Add(clientCalled.Name ?? string.Empty);
         }
         Assert.Equal(expected, callsList);
     }
     [Fact]
     public void Deve_Chamar_Mesmo_Com_Uma_Fila()
     {
-        Client clientCalled;
+        Client? clientCalled;
         var expected = new string[]{"A_1","A_2","A_3","A_4"};
         var callsList = new List<string>();
         queueList.Add(queueA);
-        queueEngine = new QueueEngine(maxWaiteTime,queueList);
+        //queueEngine = new QueueEngine(maxWaiteTime,queueList);
 
         queueEngine. InicializeLastcallTime();
         queueA.Enqueue(new Client("TIKET", "A_1"));
@@ -137,7 +144,7 @@ public class SequenceTests
 
         while ((clientCalled = queueEngine.ProcessClient()) != null)
         {
-            callsList.Add(clientCalled.Name);
+            callsList.Add(clientCalled.Name ?? string.Empty);
         }
         Assert.Equal(expected, callsList);
     }

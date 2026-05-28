@@ -23,7 +23,6 @@ public class UserPasswordValidationTests
     public void Deve_Não_Validar_Senha_Da_Entidade()
     {
         
-        var userPassword = "996699";
         var userHashedPassword = "OTk2Njk5";
         var informedPassword = "wrongPasswoed";
         var passworServiceMock = new Mock<IPasswordService>();

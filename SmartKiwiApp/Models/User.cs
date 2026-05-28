@@ -6,9 +6,9 @@ public class User
 {
     public enum Role { Admin, Employee }
 
-    private string _name;
-    private string _email;
-    private string _password;
+    private string _name = string.Empty;
+    private string _email = string.Empty;
+    private string _password = string.Empty;
     private Role _role;
     public Guid Id { get; private set; }
     public Role UserRole => _role;
