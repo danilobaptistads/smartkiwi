@@ -21,9 +21,9 @@ public class EmptyQueueTests
     [Fact]
     public void Deve_Chamar_B_Em_Sequencia_SE_A_Vazia()
     {
-        queueA.Enqueue(new Client("TICKT", "A_1"));
-        queueB.Enqueue(new Client("TICKT", "B_1"));
-        queueB.Enqueue(new Client("TICKT", "B_2"));
+        queueA.Enqueue(new Client(Guid.NewGuid(), "TICKT", "A_1"));
+        queueB.Enqueue(new Client(Guid.NewGuid(), "TICKT", "B_1"));
+        queueB.Enqueue(new Client(Guid.NewGuid(), "TICKT", "B_2"));
         queueList.Add(queueA);
         queueList.Add(queueB);
         queueList.Add(queueC);
@@ -67,20 +67,20 @@ public class EmptyQueueTests
     {
     if (!aIsEmpty)
     {
-        queueA.Enqueue(new Client("TICKT", "A_1"));
-        queueA.Enqueue(new Client("TICKT", "A_2"));
-        queueA.Enqueue(new Client("TICKT", "A_3"));
+        queueA.Enqueue(new Client(Guid.NewGuid(), "TICKT", "A_1"));
+        queueA.Enqueue(new Client(Guid.NewGuid(), "TICKT", "A_2"));
+        queueA.Enqueue(new Client(Guid.NewGuid(), "TICKT", "A_3"));
     }
 
     if (!bIsEmpty)
     {
-        queueB.Enqueue(new Client("TICKT", "B_1"));
-        queueB.Enqueue(new Client("TICKT", "B_2"));
+        queueB.Enqueue(new Client(Guid.NewGuid(), "TICKT", "B_1"));
+        queueB.Enqueue(new Client(Guid.NewGuid(), "TICKT", "B_2"));
     }
 
     if (!cIsEmpty)
     {
-        queueC.Enqueue(new Client("TICKT", "C_1"));
+        queueC.Enqueue(new Client(Guid.NewGuid(), "TICKT", "C_1"));
     }
 
     var callsList = new List<string>();
@@ -130,19 +130,19 @@ public class EmptyQueueTests
 
         if (addInA)
         {
-            queueA.Enqueue(new Client("TICKT", "A_1"));
+            queueA.Enqueue(new Client(Guid.NewGuid(), "TICKT", "A_1"));
             
         }
 
         if (addInB)
         {
-            queueB.Enqueue(new Client("TICKT", "B_1"));
+            queueB.Enqueue(new Client(Guid.NewGuid(), "TICKT", "B_1"));
     
         }
 
         if (AddInC)
         {
-            queueC.Enqueue(new Client("TICKT", "C_1"));
+            queueC.Enqueue(new Client(Guid.NewGuid(), "TICKT", "C_1"));
         }
         
         clientCalled = queueEngine.ProcessClient();

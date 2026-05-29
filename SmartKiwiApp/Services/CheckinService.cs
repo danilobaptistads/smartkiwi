@@ -33,12 +33,12 @@ public class CheckinService
         var ticket = genTickt(selectedQueue.Prefix, selectedQueue.LastTicktNumber);
         if(name == null)
         {
-            newClient = new Client(ticket);
+            newClient = new Client(selectedQueueId,ticket);
            
         }
         else
         {
-             newClient = new Client(ticket,name);
+             newClient = new Client(selectedQueueId, ticket,name);
         }
          selectedQueue.Enqueue(newClient);
         _clientRepository.Add(newClient);

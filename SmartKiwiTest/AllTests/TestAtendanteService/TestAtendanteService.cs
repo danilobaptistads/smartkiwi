@@ -20,7 +20,7 @@ public class TesteAtendanteService
         queueEngine = new QueueEngine(maxWaiteTimeMinutes,queueList);
         _clientRepositoryMock = new Mock<IClientRepository>();
         atendanteService = new AtendanteService(queueEngine, _clientRepositoryMock.Object);
-        queueA.Enqueue(new Client("TICKT", "A_1"));
+        queueA.Enqueue(new Client(Guid.NewGuid(), "TICKT", "A_1"));
     }
 
     [Fact]
