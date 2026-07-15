@@ -4,239 +4,314 @@
 
 ## [CONCLUÍDO]
 
-- Estrutura base do projeto (.NET 9 + EF Core InMemory)
-- Modelos de domínio: `User`, `Client`, `ClientQueue`, `Call`, `Atendante`, `Workstation`
-- Camada de Repositórios com interfaces (`IUserRepository`, `IClientQueueRepository`, `IClientRepository`)
-- Camada de Serviços: `UserService`, `ClientQueueService`, `CheckinService`, `AtendanteService`, `PasswordService`, `HashService`, `TokenService` (a serem substituídos pelo Identity)
-- Motor de filas (`QueueEngine`) com lógica de prioridade, round-robin e timeout
-- Autenticação hash Argon2id (a ser substituído pelo Identity)
-- Testes unitários (xUnit + Moq) para User, ClientQueue, QueueEngine, Token, Password, Hash, Checkin, Atendante
-- Interfaces para serviços: `IHashService`, `IPasswordService`, `ITokenService` (a serem removidas após migração para Identity)
+### Estrutura e Arquitetura
+- Solução dividida em `SmartKiwiApp` (aplicação) e `SmartKiwiTest` (testes)
+- Projeto .NET 9 com Entity Framework Core InMemory
+- Camadas separadas: Models, Data, Repository, Services
+
+### Modelos de Domínio
+- `Client` — Representa um cliente na fila, com ticket e nome opcional
+- `ClientQueue` — Fila com nome, prefixo, prioridade, controle de chamada e timeout
+- `Call` — Registro de chamada de atendimento (cliente, atendente, guichê, data/hora)
+- `Atendante` — Atendente com nome e número de guichê
+- `Workstation` — Guichê com nome e número (estrutura inicial)
+- `User` — Estrutura inicial removida de validações, aguardando integração com Identity
+
+### Camada de Repositórios
+- `IClientQueueRepository` / `ClientQueueRepository` — CRUD de filas com persistência
+- `IUserRepository` / `UserRepository` — CRUD de usuários (a ser substituído pelo Identity)
+- `IClientRepository` — Interface definida (implementação pendente)
+
+### Camada de Serviços
+- `ClientQueueService` — CRUD de filas com validações básicas
+- `CheckinService` — Geração de ticket e enfileiramento de clientes
+- `AtendanteService` — Processamento da próxima chamada via QueueEngine
+- `UserService` — Cadastro, autenticação e gerenciamento de usuários (a ser migrado para Identity)
+- `PasswordService` — Hash e validação de senha (será removido com Identity)
+- `HashService` — Implementação Argon2id (será removido com Identity)
+- `TokenService` — Geração/validação de JWT (será removido com Identity)
+
+### Motor de Filas
+- `QueueEngine` — Engine de seleção de filas com algoritmo round-robin ponderado por prioridade
+- Suporte a timeout (máximo de espera por fila)
+- Reset de prioridades após ciclo completo
+- Tratamento de filas vazias
+
+### Testes Unitários (xUnit + Moq)
+- Testes para `UserService` (criação, autenticação, atualização, exclusão)
+- Testes para `ClientQueueService` (criação, busca, atualização)
+- Testes para `QueueEngine` (sequência, timeout, fila vazia)
+- Testes para `CheckinService`
+- Testes para `AtendanteService`
+- Testes para `TokenService`
+- Testes para `PasswordService` e `HashService`
+- Testes para `UserRepository`
 
 ---
 
 ## [A FAZER]
 
----
-
-### 1. Refatoração/Limpeza de Entidades
-
-**User Story:** Como desenvolvedor, quero que as entidades de domínio sejam POCOs simples, sem validações ou dependências de serviço, para que o modelo fique coeso e desacoplado.
-
-#### 1.1 Extrair validações de `User.cs` para uma camada separada
-
-**Critérios de Aceite:**
-
-- [ ] Remover `ValidateName()` de `User.cs` — a validação de nome obrigatório deve ser movida para um **Validator** ou **DTO** dedicado
-- [ ] Remover `ValidateEmail()` de `User.cs` — a validação de formato de email (regex) deve ser movida para um **Validator** ou **DTO** dedicado
-- [ ] Remover `ValidatePassword()` de `User.cs` — a entidade não deve receber `IPasswordService` como parâmetro; a validação de senha deve ser feita no **service layer** antes de chamar a entidade
-- [ ] Remover `ChangePassword()` de `User.cs` — a lógica de hash e troca de senha deve ser movida para `UserService` ou `PasswordService`
-- [ ] Após extração, `User.cs` deve conter apenas propriedades (`Id`, `Name`, `Email`, `_password`, `_role`) e construtor, sem depender de interfaces externas
-- [ ] `User.cs` não deve mais importar `SmartKiwiApp.Services` nem `System.Text.RegularExpressions`
-- [ ] `User.Email` setter pode perder a validação inline (será validado externamente via DTO/FluentValidation)
-- [ ] Criar classes **DTOs** (`CreateUserDto`, `UpdateUserDto`, `UpdateEmailDto`, `ChangePasswordDto`) com validações de dados via **FluentValidation** ou **Data Annotations**
-- [ ] Todos os testes existentes em `UserEntityTests/` devem ser atualizados para testar as validações nos validators/DTOs, não na entidade
-
-#### 1.2 Encapsular campos públicos de `ClientQueue.cs`
-
-**Critérios de Aceite:**
-
-- [ ] `currentPriority` (linha 4) deve ser convertido de **public field** para **propriedade privada** com método público de atualização (ex: `DecrementPriority()`)
-- [ ] `lastCallTime` (linha 5) deve ser convertido de **public field** para **propriedade privada** com método público de atualização (ex: `UpdateLastCallTime()`)
-- [ ] Atualizar `QueueEngine.cs` para usar os métodos encapsulados em vez de acessar os fields diretamente
-- [ ] Verificar se há outros accessos diretos aos fields (grep por `currentPriority` e `lastCallTime`) e corrigi-los
-
-#### 1.3 Centralizar validações duplicadas de nome e prioridade em `ClientQueueService`
-
-**Critérios de Aceite:**
-
-- [ ] A validação `if (string.IsNullOrWhiteSpace(name))` existe em duas partes de `ClientQueueService.cs` (Create e Update) — extrair para um método privado `ValidateQueueName()` ou um validator reutilizável
-- [ ] A validação de prioridade negativa existe em Create e Update — extrair para `ValidateQueuePriority()`
-- [ ] Validar também que `priority` não seja zero (fila sem prioridade pode causar starvation), a menos que seja intencional
+### PRIORIDADE 🔴 — MVP (Sprint 1)
 
 ---
 
-### 2. Login / Autenticação de Operadores
+#### 1. Integração com ASP.NET Core Identity
 
-**User Story:** Como operador do sistema, quero fazer login com email e senha para acessar funcionalidades protegidas por role (Admin/Employee).
-
-#### 2.1 Substituir sistema de autenticação por ASP.NET Core Identity com Cookies
+**User Story:** Como administrador do sistema, quero que a autenticação seja gerenciada pelo ASP.NET Core Identity com cookies, para que o login seja seguro e padronizado sem código customizado.
 
 **Critérios de Aceite:**
-
+- [ ] `User.cs` estende `IdentityUser<Guid>` com propriedades extras `Name` (string) e `UserRole` (enum Role)
+- [ ] Campo `Email` herdado do Identity, não declarado manualmente
+- [ ] Campo `PasswordHash` herdado do Identity
+- [ ] `SmartKiwiContext` estende `IdentityDbContext<User, IdentityRole<Guid>, Guid>`
 - [ ] Adicionar pacote `Microsoft.AspNetCore.Identity.EntityFrameworkCore`
-- [ ] Remover classe `JwtConfig.cs` e `TokenService.cs` (não serão mais necessários)
-- [ ] Remover pacote `Microsoft.AspNetCore.Authentication.JwtBearer` do `.csproj`
-- [ ] Refatorar `User.cs` para estender `IdentityUser<Guid>` (ou usar `IdentityUser` com string Id)
-- [ ] Refatorar `SmartKiwiContext.cs` para estender `IdentityDbContext<User, IdentityRole<Guid>, Guid>` (ou string)
-- [ ] Configurar Identity no pipeline: `AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<SmartKiwiContext>()`
-- [ ] Configurar autenticação via cookie: `AddAuthentication().AddCookie()` com opções `HttpOnly`, `SameSite=Strict`, `ExpireTimeSpan`
-- [ ] Configurar autorização com as roles `Admin` e `Employee`: `AddAuthorization()` com políticas
-- [ ] Implementar endpoint `POST /api/auth/login` que recebe `{ email, password }`, usa `SignInManager` e define o cookie
-- [ ] Implementar endpoint `POST /api/auth/register` (apenas Admin) usando `UserManager`
-- [ ] Implementar endpoint `POST /api/auth/logout` que limpa o cookie
-- [ ] Implementar endpoint `GET /api/auth/me` que retorna dados do usuário autenticado
-- [ ] Proteger rotas com `[Authorize]` e `[Authorize(Roles = "Admin")]`
-- [ ] Testar cenários: senha inválida, email não cadastrado, acesso não autenticado redireciona 401
+- [ ] Remover pacote `Microsoft.AspNetCore.Authentication.JwtBearer`
+- [ ] Remover arquivos: `JwtConfig.cs`, `TokenService.cs`, `PasswordService.cs`, `HashService.cs`
+- [ ] Remover interfaces: `ITokenService`, `IPasswordService`, `IHashService`
+- [ ] Configurar Identity no pipeline com regras de senha:
+  - Mínimo 8 caracteres
+  - Exigir maiúscula, minúscula, dígito e caractere especial
+  - Exigir email único
+- [ ] Configurar autenticação via cookie (`AddCookie`) com `HttpOnly`, `SameSite=Strict`
+- [ ] Configurar autorização com as roles `Admin` e `Employee`
+- [ ] Criar roles `Admin` e `Employee` no startup via `RoleManager`
 
-#### 2.2 Migrar UserService para usar UserManager do Identity
+**Regras de Negócio:**
+- RN01: Todo usuário deve ter um email único no sistema
+- RN02: Apenas usuários com role `Admin` podem criar novos operadores
+- RN03: A senha deve seguir as regras de complexidade do Identity configuradas
 
-**Critérios de Aceite:**
-
-- [ ] `UserService.CreateNewUser()` deve usar `UserManager.CreateAsync()` em vez de `_userRepository.Add()`
-- [ ] `UserService.AuthenticateUser()` deve usar `SignInManager.PasswordSignInAsync()` em vez de validação manual
-- [ ] `UserService.UpdateUserName()`, `UpdateUserEmail()`, `UpdateUserPassword()`, `DeleteCurrentUser()` devem usar `UserManager`
-- [ ] `PasswordService`, `HashService` e interfaces `IPasswordService`, `IHashService` podem ser removidos (Identity já gerencia hash)
-- [ ] Migrar `UserRepository` para usar `UserManager` como repositório padrão do Identity
-- [ ] Garantir que a role `Admin` seja criada via `RoleManager.CreateAsync()` no startup se não existir
+**Prioridade:** 🔴 Alta
 
 ---
 
-### 3. Ajustes de API
+#### 2. Migrar UserService para UserManager do Identity
 
-**User Story:** Como desenvolvedor, quero uma API RESTful completa para gerenciar filas, check-in e chamadas, substituindo a interface de console.
-
-#### 3.1 Migrar de Console Application para Web API
+**User Story:** Como desenvolvedor, quero que o serviço de usuários utilize `UserManager` e `SignInManager` do Identity, eliminando a camada manual de hash e token.
 
 **Critérios de Aceite:**
+- [ ] `UserService.CreateNewUser()` usa `UserManager.CreateAsync()` em vez de `_userRepository.Add()`
+- [ ] `UserService.AuthenticateUser()` usa `SignInManager.PasswordSignInAsync()` em vez de validação manual de hash
+- [ ] Métodos `UpdateUserName()`, `UpdateUserEmail()`, `UpdateUserPassword()`, `DeleteCurrentUser()` usam `UserManager`
+- [ ] `UserRepository` removido ou adaptado (Identity provê persistência via UserManager)
+- [ ] `IUserRepository` removido
+- [ ] Testes de `UserServiceTests/` e `UserRepositoryTests/` atualizados ou removidos
+- [ ] Testes de `PasswordServiceTests`, `HashServiceTests`, `TokenServiceTests` removidos
+- [ ] Projeto compila sem erros
 
-- [ ] Mudar `SmartKiwi.csproj`: descomentar `<OutputType>Exe</OutputType>` não é suficiente — é preciso trocar o SDK para `Microsoft.NET.Sdk.Web`
-- [ ] Adicionar `Program.cs` com `WebApplication.CreateBuilder(args)` configurando serviços (DbContext, Repositories, Services, Authentication, Authorization, Swagger)
-- [ ] Configurar EF Core InMemory para desenvolvimento (manter compatível com testes atuais)
-- [ ] Adicionar suporte a Controllers (`builder.Services.AddControllers()`)
-- [ ] Adicionar middleware de desenvolvimento (Swagger/OpenAPI) opcional
+**Prioridade:** 🔴 Alta
 
-#### 3.2 CRUD de Filas (API)
+---
 
-**Critérios de Aceite:**
+#### 3. Migrar de Console Application para Web API
 
-- [ ] `GET    /api/queues` — Listar todas as filas do usuário autenticado
-- [ ] `GET    /api/queues/{id}` — Obter fila por ID
-- [ ] `POST   /api/queues` — Criar nova fila (body: `{ name, prefix, priority }`)
-- [ ] `PUT    /api/queues/{id}/name` — Atualizar nome da fila
-- [ ] `PUT    /api/queues/{id}/priority` — Atualizar prioridade da fila
-- [ ] `PUT    /api/queues/{id}/prefix` — Atualizar prefixo da fila
-- [ ] `DELETE /api/queues/{id}` — Remover fila
-- [ ] Todos os endpoints devem exigir autenticação via cookie (Identity)
-- [ ] Respostas seguindo padrão REST (201 para criação, 404 se não encontrado, 400 para validação)
-
-#### 3.3 Check-in (API)
+**User Story:** Como desenvolvedor, quero que o projeto seja uma Web API para expor endpoints RESTful, substituindo a interface de console.
 
 **Critérios de Aceite:**
+- [ ] SDK do `.csproj` alterado para `Microsoft.NET.Sdk.Web`
+- [ ] `Program.cs` configurado com `WebApplication.CreateBuilder(args)`
+- [ ] Serviços registrados no DI: DbContext, Repositories, Services, Identity
+- [ ] Controllers configurados (`AddControllers()`)
+- [ ] Swagger/OpenAPI configurado (opcional para desenvolvimento)
+- [ ] EF Core InMemory mantido para desenvolvimento
 
-- [ ] `POST /api/queues/{queueId}/checkin` — Realizar check-in em uma fila (body opcional: `{ clientName }`)
-- [ ] Retornar o ticket gerado (ex: `{ ticket: "P004", clientId, queueName }`)
-- [ ] Validar que a fila existe antes de fazer check-in
-- [ ] Incrementar `LastTicktNumber` corretamente
+**Prioridade:** 🔴 Alta
 
-#### 3.4 Chamada de Atendimento (API)
+---
+
+### PRIORIDADE 🟡 — MVP (Sprint 2)
+
+---
+
+#### 4. Endpoints de Autenticação
+
+**User Story:** Como operador, quero fazer login e logout no sistema para acessar as funcionalidades protegidas.
 
 **Critérios de Aceite:**
+- [ ] `POST /api/auth/login` — Recebe `{ email, password }`, usa `SignInManager`, retorna cookie
+- [ ] `POST /api/auth/register` — Apenas Admin, cria novo operador via `UserManager`
+- [ ] `POST /api/auth/logout` — Limpa o cookie de autenticação
+- [ ] `GET /api/auth/me` — Retorna dados do usuário autenticado
+- [ ] Rotas protegidas com `[Authorize]` e `[Authorize(Roles = "Admin")]`
+- [ ] Testes: senha inválida → 401, email não cadastrado → 401, acesso não autenticado → 401
 
-- [ ] `POST /api/attendance/call` — Chamar próximo cliente da fila (body: `{ atendanteName, ticketWindow }`)
-- [ ] Retornar os dados do cliente chamado e o guichê (`{ clientName, ticket, ticketWindow }`)
-- [ ] Criar registro de `Call` no banco
-- [ ] Remover o cliente da fila após chamada
-- [ ] Retornar 204 se não houver clientes na fila
+**Regras de Negócio:**
+- RN04: Apenas usuários com role `Admin` podem acessar `POST /api/auth/register`
 
-#### 3.5 Tratamento de erros global
+**Prioridade:** 🟡 Média
+
+---
+
+#### 5. Tratamento Global de Erros
+
+**User Story:** Como desenvolvedor, quero um middleware global que padronize as respostas de erro da API.
 
 **Critérios de Aceite:**
-
-- [ ] Criar **Exception Handling Middleware** ou **Filter** global para capturar exceções e retornar responses padronizadas:
+- [ ] Middleware captura exceções e retorna JSON padronizado:
   - `ArgumentException` → 400 Bad Request
   - `InvalidOperationException` → 409 Conflict
   - `UnauthorizedAccessException` → 401 Unauthorized
   - `NotFoundException` → 404 Not Found
   - Erros não mapeados → 500 Internal Server Error
 
----
-
-### 4. Habilitar Guichê no Painel
-
-**User Story:** Como operador, quero ativar/desativar guichês (Workstations) e visualizar o número correspondente no painel, para gerenciar quais guichês estão disponíveis para atendimento.
-
-#### 4.1 Entidade Guichê (Workstation)
-
-**Critérios de Aceite:**
-
-- [ ] Avaliar se `Workstation.cs` atual atende aos requisitos de negócio ou precisa ser estendido
-- [ ] Garantir que `Workstation` tenha: `Id`, `Name`, `TicketWindow`, `IsActive` (bool para ativar/desativar)
-- [ ] `Workstation.IsActive` deve permitir habilitar/desabilitar um guichê sem deletá-lo
-- [ ] Garantir o DbSet `Workstations` já existe em `SmartKiwiContext.cs`
-- [ ] Criar repositório `IWorkstationRepository` e `WorkstationRepository` (CRUD básico)
-- [ ] Criar `WorkstationService` com métodos `Activate()`, `Deactivate()`, `ListActive()`, `ListAll()`
-
-#### 4.2 API de Guichês
-
-**Critérios de Aceite:**
-
-- [ ] `GET    /api/workstations` — Listar todos os guichês
-- [ ] `GET    /api/workstations/active` — Listar apenas guichês ativos
-- [ ] `POST   /api/workstations` — Criar novo guichê (body: `{ name, ticketWindow }`)
-- [ ] `PUT    /api/workstations/{id}/activate` — Ativar guichê
-- [ ] `PUT    /api/workstations/{id}/deactivate` — Desativar guichê
-- [ ] `DELETE /api/workstations/{id}` — Remover guichê (apenas se não estiver em uso)
-
-#### 4.3 Painel de Exibição
-
-**Critérios de Aceite:**
-
-- [ ] Criar endpoint `GET /api/panel` que retorna o estado atual do painel:
-  ```json
-  {
-    "activeWorkstations": [
-      { "id": 1, "name": "Guichê 1", "ticketWindow": "01" },
-      { "id": 2, "name": "Guichê 2", "ticketWindow": "02" }
-    ],
-    "lastCalls": [
-      { "ticket": "P004", "ticketWindow": "01", "atendante": "João", "calledAt": "2026-07-13T10:30:00" }
-    ],
-    "queuesStatus": [
-      { "queueName": "Prioritária", "waitingCount": 3, "lastTicket": "P005" },
-      { "queueName": "Comum", "waitingCount": 7, "lastTicket": "C012" }
-    ]
-  }
-  ```
-- [ ] O painel deve refletir apenas os últimos N chamados (ex: últimos 10)
-- [ ] Os guichês inativos não devem aparecer no painel
-- [ ] Criar `PanelService` para montar os dados do painel a partir dos repositórios
-- [ ] Se aplicável, criar um endpoint SSE (`GET /api/panel/stream`) para atualização em tempo real
-
-#### 4.4 Relacionar Atendimento com Guichê
-
-**Critérios de Aceite:**
-
-- [ ] No momento da chamada (`POST /api/attendance/call`), o `ticketWindow` informado deve corresponder a um guichê ativo
-- [ ] Validar se o guichê existe e está ativo antes de processar a chamada
-- [ ] Retornar erro 400 se o guichê estiver inativo ou não existir
+**Prioridade:** 🟡 Média
 
 ---
 
-### 5. Melhorias Técnicas (Extra)
+#### 6. Implementar ClientRepository
 
-#### 5.1 Implementar `ClientRepository`
-
-**Critérios de Aceite:**
-
-- [ ] Criar `ClientRepository : IClientRepository` com implementações de `Add`, `GetRemainClients` e `RemoveClient`
-- [ ] Injetar `SmartKiwiContext` via construtor
-- [ ] Registrar no DI
-
-#### 5.2 Remover dependência circular e duplicação Service/Repository
+**User Story:** Como desenvolvedor, quero uma implementação concreta de `IClientRepository` para persistir clientes.
 
 **Critérios de Aceite:**
+- [ ] `ClientRepository : IClientRepository` com `Add`, `GetRemainClients`, `RemoveClient`
+- [ ] Injeção de `SmartKiwiContext` via construtor
+- [ ] Registrado no DI
 
-- [ ] Em `UserRepository.cs`, validar unicidade de email apenas no repository ou apenas no service, não em ambos
-- [ ] Em `ClientQueueRepository.cs`, a validação de existência (`GetQueueById` lança exceção) duplica a validação do service — decidir se repository lança exceção ou retorna null
-- [ ] Unificar padrão: repositories retornam null quando não encontram; services validam e lançam exceções de negócio
+**Prioridade:** 🟡 Média
 
-#### 5.3 Testes para novas funcionalidades
+---
+
+#### 7. Centralizar Validações Duplicadas em ClientQueueService
+
+**User Story:** Como desenvolvedor, quero que as validações de nome e prioridade não estejam duplicadas no `ClientQueueService`.
 
 **Critérios de Aceite:**
+- [ ] Validação de nome extraída para método privado reutilizável (`ValidateQueueName()`)
+- [ ] Validação de prioridade extraída para método privado reutilizável (`ValidateQueuePriority()`)
+- [ ] Ambos os métodos usados tanto no Create quanto no Update
+- [ ] Todos os testes de `ClientQueueTests/` passam
 
-- [ ] Testes unitários para `PanelService`
-- [ ] Testes unitários para `WorkstationService`
-- [ ] Testes de integração para os novos endpoints de API
-- [ ] Testes de validação de DTOs (se usar FluentValidation)
-- [ ] Atualizar testes existentes após refatoração de entidades
+**Prioridade:** 🟡 Média
+
+---
+
+### PRIORIDADE 🟢 — MVP (Sprint 3)
+
+---
+
+#### 8. CRUD de Filas (API)
+
+**User Story:** Como operador, quero gerenciar filas via API para criar, listar, atualizar e remover filas do sistema.
+
+**Critérios de Aceite:**
+- [ ] `GET    /api/queues` — Lista filas do usuário autenticado
+- [ ] `GET    /api/queues/{id}` — Obtém fila por ID
+- [ ] `POST   /api/queues` — Cria fila (body: `{ name, prefix, priority }`)
+- [ ] `PUT    /api/queues/{id}/name` — Atualiza nome
+- [ ] `PUT    /api/queues/{id}/priority` — Atualiza prioridade
+- [ ] `PUT    /api/queues/{id}/prefix` — Atualiza prefixo
+- [ ] `DELETE /api/queues/{id}` — Remove fila
+- [ ] Todos os endpoints exigem autenticação via cookie
+- [ ] Respostas REST: 201 (criação), 204 (sucesso sem corpo), 400 (validação), 401 (não autenticado), 404 (não encontrado)
+
+**Prioridade:** 🟢 Média-Baixa
+
+---
+
+#### 9. Check-in (API)
+
+**User Story:** Como operador, quero realizar check-in de clientes em uma fila via API para gerar tickets de atendimento.
+
+**Critérios de Aceite:**
+- [ ] `POST /api/queues/{queueId}/checkin` — Check-in com nome opcional (`{ clientName }`)
+- [ ] Retorna o ticket gerado (`{ ticket: "P004", clientId, queueName }`)
+- [ ] Valida que a fila existe
+- [ ] Incrementa `LastTicktNumber` corretamente
+- [ ] Prefixo da fila + número formatado (ex: `P004`)
+
+**Regras de Negócio:**
+- RN05: O ticket é composto pelo prefixo da fila + número sequencial formatado com 3 dígitos
+
+**Prioridade:** 🟢 Média-Baixa
+
+---
+
+#### 10. Chamada de Atendimento (API)
+
+**User Story:** Como atendente, quero chamar o próximo cliente da fila via API para iniciar o atendimento.
+
+**Critérios de Aceite:**
+- [ ] `POST /api/attendance/call` — Chama próximo cliente (body: `{ atendanteName, ticketWindow }`)
+- [ ] Retorna `{ clientName, ticket, ticketWindow }` do cliente chamado
+- [ ] Cria registro de `Call` no banco
+- [ ] Remove o cliente da fila
+- [ ] Retorna 204 se não houver clientes na fila
+- [ ] Usa `QueueEngine` para selecionar a próxima fila (prioridade + timeout)
+
+**Prioridade:** 🟢 Média-Baixa
+
+---
+
+### PRIORIDADE 🔵 — Pós-MVP (Sprint 4)
+
+---
+
+#### 11. Guichê (Workstation) com Ativação/Desativação
+
+**User Story:** Como administrador, quero gerenciar guichês de atendimento, ativando e desativando conforme a necessidade.
+
+**Critérios de Aceite:**
+- [ ] `Workstation` estendida com `IsActive` (bool)
+- [ ] `IWorkstationRepository` e `WorkstationRepository` criados
+- [ ] `WorkstationService` com `Activate()`, `Deactivate()`, `ListActive()`, `ListAll()`
+- [ ] `GET    /api/workstations` — Lista todos
+- [ ] `GET    /api/workstations/active` — Lista apenas ativos
+- [ ] `POST   /api/workstations` — Cria guichê
+- [ ] `PUT    /api/workstations/{id}/activate` — Ativa
+- [ ] `PUT    /api/workstations/{id}/deactivate` — Desativa
+- [ ] `DELETE /api/workstations/{id}` — Remove apenas se sem histórico de uso
+
+**Prioridade:** 🔵 Baixa
+
+---
+
+#### 12. Vincular Chamada com Guichê Ativo
+
+**User Story:** Como atendente, quero que a chamada de atendimento valide se o guichê informado está ativo.
+
+**Critérios de Aceite:**
+- [ ] `POST /api/attendance/call` valida que `ticketWindow` corresponde a um guichê ativo
+- [ ] Retorna 400 se o guichê estiver inativo ou não existir
+
+**Prioridade:** 🔵 Baixa
+
+---
+
+#### 13. Painel de Exibição
+
+**User Story:** Como operador, quero um painel que exiba o estado atual das filas, guichês ativos e últimas chamadas.
+
+**Critérios de Aceite:**
+- [ ] `GET /api/panel` — Retorna:
+  - Guichês ativos
+  - Últimas N chamadas (ex: 10)
+  - Status das filas (nome, quantidade aguardando, último ticket)
+- [ ] `PanelService` criado para agregar dados
+- [ ] Guichês inativos não aparecem no painel
+
+**Prioridade:** 🔵 Baixa
+
+---
+
+## 📊 Resumo de Prioridades
+
+| Prioridade | Sprint | Itens |
+|---|:---:|---|
+| 🔴 Alta | Sprint 1 | Identity, UserService migração, Web API |
+| 🟡 Média | Sprint 2 | Endpoints auth, Error handling, ClientRepository, validações |
+| 🟢 Média-Baixa | Sprint 3 | CRUD filas API, Check-in API, Chamada API |
+| 🔵 Baixa | Sprint 4 | Guichê, Painel |
+
+## 🧱 Dependências do MVP
+
+```mermaid
+graph LR
+    A[Identity] --> B[Web API]
+    B --> C[Endpoints Auth]
+    C --> D[CRUD Filas API]
+    C --> E[Check-in API]
+    C --> F[Chamada API]
+    E --> G[Painel]
+    F --> G
+    F --> H[Guichê Ativo]
+```
