@@ -2,15 +2,6 @@
 
 ## A Fazer
 
-### **1.9** Configurar Identity no pipeline (regras de senha: 8 chars, maiúscula, minúscula, dígito, especial, email único)
-
-
-### **1.10** Configurar autenticação via cookie (`AddCookie`) com `HttpOnly`, `SameSite=Strict`
-
-
-### **1.11** Configurar autorização com roles `Admin` e `Employee` e criá-las via `RoleManager`
-
-
 ### **2.1** `CreateNewUser()` usar `UserManager.CreateAsync()` em vez de `_userRepository.Add()`
 
 
@@ -32,10 +23,13 @@
 ### **2.7** Remover `UserRepository` e `IUserRepository`
 
 
-### **2.8** Testes de `UserServiceTests` e `UserRepositoryTests` atualizados; testes legados removidos (`PasswordServiceTests`, `HashServiceTests`, `TokenServiceTests`); projeto compila
+### **1.7** Remover arquivos: `JwtConfig.cs`, `TokenService.cs`, `PasswordService.cs`, `HashService.cs`
 
 
-### **3.1** SDK do `.csproj` alterado para `Microsoft.NET.Sdk.Web`
+### **1.8** Remover interfaces: `ITokenService`, `IPasswordService`, `IHashService`
+
+
+### **1.6** Remover pacote `Microsoft.AspNetCore.Authentication.JwtBearer`
 
 
 ### **3.2** `Program.cs` configurado com `WebApplication.CreateBuilder(args)`
@@ -50,35 +44,44 @@
 ### **3.5** Swagger/OpenAPI configurado
 
 
-### **3.6** EF Core InMemory mantido para desenvolvimento
+### **1.9** Configurar Identity no pipeline (regras de senha: 8 chars, maiúscula, minúscula, dígito, especial, email único)
+
+
+### **1.10** Configurar autenticação via cookie (`AddCookie`) com `HttpOnly`, `SameSite=Strict`
+
+
+### **1.11** Configurar autorização com roles `Admin` e `Employee` e criá-las via `RoleManager`
+
+
+### **2.8** Testes de `UserServiceTests` e `UserRepositoryTests` atualizados; testes legados removidos (`PasswordServiceTests`, `HashServiceTests`, `TokenServiceTests`); projeto compila sem erros
 
 
 ## Em Andamento
 
-### **1.6** Remover pacote `Microsoft.AspNetCore.Authentication.JwtBearer`
-
-
-### **1.7** Remover arquivos: `JwtConfig.cs`, `TokenService.cs`, `PasswordService.cs`, `HashService.cs`
-
-
-### **1.8** Remover interfaces: `ITokenService`, `IPasswordService`, `IHashService`
-
-
 ## Concluído
-
-### **1.3** Campo `PasswordHash` herdado do Identity, não declarado manualmente em User.cs
-
 
 ### **1.5** Adicionar pacote `Microsoft.AspNetCore.Identity.EntityFrameworkCore`
 
 
-### **1.4** SmartKiwiContext estender `IdentityDbContext<User, IdentityRole<Guid>, Guid>`
+### **1.4** `SmartKiwiContext` estender `IdentityDbContext<User, IdentityRole<Guid>, Guid>`
 
 
-### **1.2** Campo `Email` herdado do Identity, não declarado manualmente em User.cs
+### **1.3** Campo `PasswordHash` herdado do Identity, não declarado manualmente em `User.cs`
 
 
-### **1.1** User.cs estender `IdentityUser<Guid>` com `Name` (string) e `UserRole` (enum Role)
+### **1.2** Campo `Email` herdado do Identity, não declarado manualmente em `User.cs`
+
+
+### **1.1** `User.cs` estender `IdentityUser<Guid>` com `Name` (string) e `UserRole` (enum Role)
+
+
+### **3.6** EF Core InMemory mantido para desenvolvimento
+
+
+### **3.1** SDK do `.csproj` alterado para `Microsoft.NET.Sdk.Web`
+
+
+### Nenhum cartão concluído nesta sprint.
 
 
 ## 🚧 Impedimentos
@@ -88,13 +91,7 @@
 
 ## 📝 Observações
 
-### O projeto não compila no estado atual: `User.cs` não tem `Id`, `Email`, `PasswordHash` mas `UserService` referencia esses campos — inconsistência será resolvida ao migrar para Identity.
-
-
-### `SmartKiwi.csproj` é class library (sem `<OutputType>`), precisa virar Web SDK.
-
-
-### `Program.cs` está vazio (todo comentado), será reescrito do zero.
+### Ordem dos cartões respeita dependências: fundação → modelos → migração UserService → limpeza legados → pipeline → testes.
 
 
 ### `Baseantiga/` contém código legado do console — não será migrado.
