@@ -1,30 +1,27 @@
+using SmartKiwiApp.Dto;
 using SmartKiwiApp.Models;
-using SmartKiwiApp.Repository;
+using Microsoft.AspNetCore.Identity;
 
 namespace SmartKiwiApp.Services;
 public class UserService
 {
-    private readonly ITokenService _tokenService;
-    private readonly IUserRepository _userRepository;
-    private readonly IPasswordService _passwordService;
-    public UserService(IUserRepository repository, IPasswordService passwordService, ITokenService tokenService)
+    private readonly UserManager<User> _userManager;
+    public UserService(UserManager<User> userManager)
     {
-        _userRepository = repository;
-        _tokenService = tokenService;
-        _passwordService = passwordService;
-        
+        _userManager = userManager;
     }
-    public async Task CreateNewUSer(string name, string email, string rawPassword)
+    public async Task<IdentityResult> CreateNewUSer(string name, string email, string rawPassword)
     {
         
-        var hashedPassword = _passwordService.ProcssesHashNewPassword(rawPassword);
-        var newUser = new User(name, email, hashedPassword);
-        var emailAlreadyExist = await _userRepository.GetUserByEmail(newUser.Email);
-        if (emailAlreadyExist !=null)
+        var userDto = new NewUserDto(name,email,rawPassword);
+        var newUser = new User()
         {
-            throw new InvalidOperationException("Não foi possível realizar o cadastro");
-        }
-        await _userRepository.Add(newUser);
+            Name = userDto.name,
+            Email = userDto.email,
+            UserName = userDto.email
+        };
+
+        return await _userManager.CreateAsync(newUser, userDto.rawPassword);
         
     }
 
