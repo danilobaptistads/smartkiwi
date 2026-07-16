@@ -10,10 +10,8 @@ public class UserService
     {
         _userManager = userManager;
     }
-    public async Task<IdentityResult> CreateNewUSer(string name, string email, string rawPassword)
-    {
-        
-        var userDto = new NewUserDto(name,email,rawPassword);
+    public async Task<IdentityResult> CreateNewUSer(CreateUserRequestDto userDto)
+    {    
         var newUser = new User()
         {
             Name = userDto.name,
@@ -21,43 +19,47 @@ public class UserService
             UserName = userDto.email
         };
 
-        return await _userManager.CreateAsync(newUser, userDto.rawPassword);
+        return await _userManager.CreateAsync(newUser, userDto.rawPassword);   
+    }
+    public async Task<IdentityResult> UpdateUserName(UpdateUserNameDto userDto)
+    {
+        var userToUpdate = await _userManager.FindByIdAsync(userDto.currentUserId);
+        if(userToUpdate == null)
+        {
+            throw new ArgumentException("Não foi possivel realizar a alteração");
+        }
+        userToUpdate.Name = userDto.newName;
         
+        return await _userManager.UpdateAsync(userToUpdate);
     }
-
-    public async Task UpdateUserName(Guid currentUSerID, string newName)
+    public async Task<IdentityResult> UpdateUserEmail(UpdateUserEmailDto userDto)
     {
-        var userToUpdate = await _userRepository.GetUserById(currentUSerID);
+        var userToUpdate = await _userManager.FindByIdAsync(userDto.currentUserId);
         if(userToUpdate == null)
         {
             throw new ArgumentException("Não foi possivel realizar a alteração");
         }
-    
-        await _userRepository.UpdateName(userToUpdate, newName);
+        
+        var isValidPassword = await _userManager.CheckPasswordAsync(userToUpdate, userDto.informedPassword);
+        if(!isValidPassword)
+        {
+            throw new ArgumentException("Não foi possivel realizar a alteração");
+        }
+
+        userToUpdate.Email = userDto.newEmail;
+
+        return await _userManager.UpdateAsync(userToUpdate);
     }
 
-    public async Task UpdateUserEmail(Guid currentUSerID, string currentUserPassword,string newName)
+    public async Task<IdentityResult> UpdateUserPassword(UpdateUserPasswordDto userDto)
     {
-        var userToUpdate = await _userRepository.GetUserById(currentUSerID);
+        var userToUpdate = await _userManager.FindByIdAsync(userDto.currentUserId);
         if(userToUpdate == null)
         {
             throw new ArgumentException("Não foi possivel realizar a alteração");
         }
-        if(!userToUpdate.ValidatePassword(currentUserPassword, _passwordService))
-        {
-            throw new ArgumentException("Não foi possivel realizar a alteração");
-        }
-        await _userRepository.UpdateEmail(userToUpdate, newName);
-    }
 
-    public async Task UpdateUserPassword(Guid currentUSerId, string newPassword, string informedPassword)
-    {
-        var userToUpdate = await _userRepository.GetUserById(currentUSerId);
-        if(userToUpdate == null || !userToUpdate.ValidatePassword(informedPassword, _passwordService))
-        {
-            throw new ArgumentException("Não foi possivel realizar a alteração");
-        }
-        await _userRepository.UpdatePassword(userToUpdate, newPassword, informedPassword, _passwordService);
+        return await _userManager.ChangePasswordAsync(userToUpdate, userDto.informedPassword,userDto.newPassword);
     }
 
     public async Task DeleteCurrentUser(Guid currentUserId,string informedPassword)
