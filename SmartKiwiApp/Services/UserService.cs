@@ -6,11 +6,13 @@ namespace SmartKiwiApp.Services;
 public class UserService
 {
     private readonly UserManager<User> _userManager;
-    public UserService(UserManager<User> userManager)
+    private readonly SignInManager<User> _signInManager;
+    public UserService(UserManager<User> userManager, SignInManager<User> signInManager)
     {
         _userManager = userManager;
+        _signInManager = signInManager;
     }
-    public async Task<IdentityResult> CreateNewUSer(CreateUserRequestDto userDto)
+    public async Task<IdentityResult> CreateNewUSer(CreateUserRequest userDto)
     {    
         var newUser = new User()
         {
@@ -21,9 +23,9 @@ public class UserService
 
         return await _userManager.CreateAsync(newUser, userDto.rawPassword);   
     }
-    public async Task<IdentityResult> UpdateUserName(UpdateUserNameDto userDto)
+    public async Task<IdentityResult> UpdateUserName(UpdateNameRequest userDto)
     {
-        var userToUpdate = await _userManager.FindByIdAsync(userDto.currentUserId);
+        var userToUpdate = await _userManager.FindByIdAsync(userDto.Id);
         if(userToUpdate == null)
         {
             throw new ArgumentException("Não foi possivel realizar a alteração");
@@ -32,9 +34,9 @@ public class UserService
         
         return await _userManager.UpdateAsync(userToUpdate);
     }
-    public async Task<IdentityResult> UpdateUserEmail(UpdateUserEmailDto userDto)
+    public async Task<IdentityResult> UpdateUserEmail(UpdateEmailRequest userDto)
     {
-        var userToUpdate = await _userManager.FindByIdAsync(userDto.currentUserId);
+        var userToUpdate = await _userManager.FindByIdAsync(userDto.Id);
         if(userToUpdate == null)
         {
             throw new ArgumentException("Não foi possivel realizar a alteração");
@@ -50,10 +52,9 @@ public class UserService
 
         return await _userManager.UpdateAsync(userToUpdate);
     }
-
-    public async Task<IdentityResult> UpdateUserPassword(UpdateUserPasswordDto userDto)
+    public async Task<IdentityResult> UpdateUserPassword(UpdatePasswordRequest userDto)
     {
-        var userToUpdate = await _userManager.FindByIdAsync(userDto.currentUserId);
+        var userToUpdate = await _userManager.FindByIdAsync(userDto.Id);
         if(userToUpdate == null)
         {
             throw new ArgumentException("Não foi possivel realizar a alteração");
@@ -61,29 +62,31 @@ public class UserService
 
         return await _userManager.ChangePasswordAsync(userToUpdate, userDto.informedPassword,userDto.newPassword);
     }
-
-    public async Task DeleteCurrentUser(Guid currentUserId,string informedPassword)
+    public async Task<IdentityResult> DeleteCurrentUser(RemoveUserRequest userDto)
     {
-        var userToDelete = await _userRepository.GetUserById(currentUserId);
-        if(userToDelete == null || !userToDelete.ValidatePassword(informedPassword, _passwordService))
+        var userToDelete = await _userManager.FindByIdAsync(userDto.Id);
+        if(userToDelete == null)
+        {
+            throw new ArgumentException("Não foi possivel realizar a alteração");
+        }
+        var isValidPassword = await _userManager.CheckPasswordAsync(userToDelete, userDto.informedPassword);
+        if (!isValidPassword)
         {
             throw new ArgumentException("Não foi possivel realizar a alteração");
         }
 
-        await _userRepository.DeleteUser(userToDelete);
+        return await _userManager.DeleteAsync(userToDelete);
 
     }
-
-    public async Task<string> AuthenticateUser(string informedEmail, string informedPassword)
+    public async  Task<SignInResult> AuthenticateUser(LoginRequest userDto)
     {
-        var userToAuthenticate = await _userRepository.GetUserByEmail(informedEmail);
-        if(userToAuthenticate == null || !userToAuthenticate.ValidatePassword(informedPassword, _passwordService))
-        {
-            throw new UnauthorizedAccessException("Usuário ou senha inválidos");
-            
-        }
-        return _tokenService.GenerateToken(userToAuthenticate);
-        
+        return await _signInManager.PasswordSignInAsync(
+            userDto.informedEmail, 
+            userDto.informedPassword,
+            isPersistent: true,
+            lockoutOnFailure: true
+           
+            );
 
     }
 }
