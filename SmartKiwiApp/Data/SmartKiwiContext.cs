@@ -4,7 +4,7 @@ using  Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace SmartKiwiApp.Data;
-public class SmartKiwiContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
+public class SmartKiwiContext : IdentityUserContext<User, Guid>
     {
     public DbSet<Call> Calls { get; set; }  
     public DbSet<Client> Clients { get; set; }
