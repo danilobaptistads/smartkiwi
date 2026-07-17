@@ -16,21 +16,22 @@ public class UserService
     {    
         var newUser = new User()
         {
-            Name = userDto.name,
-            Email = userDto.email,
-            UserName = userDto.email
+            Name = userDto.Name,
+            Email = userDto.Email,
+            UserName = userDto.Email
         };
-
-        return await _userManager.CreateAsync(newUser, userDto.rawPassword);   
+        
+        return await _userManager.CreateAsync(newUser, userDto.RawPassword);
+        
     }
     public async Task<IdentityResult> UpdateUserName(UpdateNameRequest userDto)
     {
         var userToUpdate = await _userManager.FindByIdAsync(userDto.Id);
         if(userToUpdate == null)
         {
-            throw new ArgumentException("Não foi possivel realizar a alteração");
+            return IdentityResult.Failed();
         }
-        userToUpdate.Name = userDto.newName;
+        userToUpdate.Name = userDto.NewName;
         
         return await _userManager.UpdateAsync(userToUpdate);
     }
@@ -39,16 +40,16 @@ public class UserService
         var userToUpdate = await _userManager.FindByIdAsync(userDto.Id);
         if(userToUpdate == null)
         {
-            throw new ArgumentException("Não foi possivel realizar a alteração");
+            return IdentityResult.Failed();
         }
         
-        var isValidPassword = await _userManager.CheckPasswordAsync(userToUpdate, userDto.informedPassword);
+        var isValidPassword = await _userManager.CheckPasswordAsync(userToUpdate, userDto.InformedPassword);
         if(!isValidPassword)
         {
-            throw new ArgumentException("Não foi possivel realizar a alteração");
+             return IdentityResult.Failed();
         }
 
-        userToUpdate.Email = userDto.newEmail;
+        userToUpdate.Email = userDto.NewEmail;
 
         return await _userManager.UpdateAsync(userToUpdate);
     }
@@ -57,36 +58,43 @@ public class UserService
         var userToUpdate = await _userManager.FindByIdAsync(userDto.Id);
         if(userToUpdate == null)
         {
-            throw new ArgumentException("Não foi possivel realizar a alteração");
+            return IdentityResult.Failed();
         }
 
-        return await _userManager.ChangePasswordAsync(userToUpdate, userDto.informedPassword,userDto.newPassword);
+        return await _userManager.ChangePasswordAsync(userToUpdate, userDto.InformedPassword,userDto.NewPassword);
     }
     public async Task<IdentityResult> DeleteCurrentUser(RemoveUserRequest userDto)
     {
         var userToDelete = await _userManager.FindByIdAsync(userDto.Id);
         if(userToDelete == null)
         {
-            throw new ArgumentException("Não foi possivel realizar a alteração");
+            return IdentityResult.Failed();
         }
-        var isValidPassword = await _userManager.CheckPasswordAsync(userToDelete, userDto.informedPassword);
+        var isValidPassword = await _userManager.CheckPasswordAsync(userToDelete, userDto.InformedPassword);
         if (!isValidPassword)
         {
-            throw new ArgumentException("Não foi possivel realizar a alteração");
+            return IdentityResult.Failed();
         }
 
         return await _userManager.DeleteAsync(userToDelete);
 
     }
-    public async  Task<SignInResult> AuthenticateUser(LoginRequest userDto)
+    public async  Task<User> AuthenticateUser(LoginRequest userDto)
     {
-        return await _signInManager.PasswordSignInAsync(
-            userDto.informedEmail, 
-            userDto.informedPassword,
-            isPersistent: true,
-            lockoutOnFailure: true
-           
-            );
+    
+        var userToAuthenticate = await _userManager.FindByEmailAsync(userDto.InformedEmail);
+        if(userToAuthenticate == null)
+        {
+            return null!;
+        }
+        
+        var isValidPassword = await _userManager.CheckPasswordAsync(userToAuthenticate, userDto.InformedPassword);
+
+        if (!isValidPassword)
+        {
+            return null!;
+        }
+        return userToAuthenticate;
 
     }
 }
