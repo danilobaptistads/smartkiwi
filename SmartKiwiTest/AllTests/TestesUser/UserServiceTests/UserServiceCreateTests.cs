@@ -1,56 +1,119 @@
-using Moq;
+using SmartKiwiApp.Dto;
 using SmartKiwiApp.Data;
 using SmartKiwiApp.Models;
 using SmartKiwiApp.Services;
-using SmartKiwiApp.Repository;
+using Microsoft.Data.Sqlite;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 public class UserServiceCreateTests
 {
-    private readonly Mock<ITokenService> _tokenServiceMock;
-    private readonly Mock<IUserRepository> _userRepositoryMock;
-    private readonly Mock<IPasswordService> _passwordServiceMock;
-    private readonly UserService userService;
-    
-    public UserServiceCreateTests()
-    {
-        _tokenServiceMock = new Mock<ITokenService>();
-        _userRepositoryMock = new Mock<IUserRepository>();
-        _passwordServiceMock = new Mock<IPasswordService>();
-        userService = new UserService( _userRepositoryMock.Object, _passwordServiceMock.Object, _tokenServiceMock.Object);
-        
-    }
-    [Fact]
-    public async Task Deve_Chamar_Metodos_Add_E_GEtEmailById_E_ProcssesHashNewPassword()
-    {
-        var userRawPassword = "996699";
-        var userHashedPassword = "OTk2Njk5";
-        
-        
-        _userRepositoryMock.Setup(x => x.Add(It.IsAny<User>())).Returns(Task.CompletedTask);
-        _userRepositoryMock.Setup(x => x.GetUserByEmail("dan@hotmail.com")).ReturnsAsync((User?)null);
-        _passwordServiceMock.Setup(x => x.ProcssesHashNewPassword(userRawPassword)).Returns(userHashedPassword);
-        
-         await userService.CreateNewUSer("danilo", "dan@hotmail.com","996699");
-        
-        _passwordServiceMock.Verify(x => x.ProcssesHashNewPassword(userRawPassword), Times.Once);
-        _userRepositoryMock.Verify(x => x.Add(It.IsAny<User>()), Times.Once);
-        _userRepositoryMock.Verify(x => x.GetUserByEmail("dan@hotmail.com"), Times.Once);
-    
-    }
 
     [Fact]
-    public async Task Deve_Não_Chammar_Metodo_Add_Quando_Email_Já_Cadastrado()
-    {      
+    public async Task Deve_Criar_um_Novo_usuario()
+    {
+        var (connection, provider) = DbTestCongigure();
+        using(connection)
+        using(provider)
+        {
+            var userManager = provider.GetRequiredService<UserManager<User>>();
+            var userService = new UserService(userManager);
+            var result = await userService.CreateNewUSer(new CreateUserRequest
+            (
+                "danilo",
+                "dan@hotmail.com",
+                "Q4t3$t26",
+                UserRole.Admin
+            ));    
+            Assert.True(result.Succeeded);
+        }
 
-        var AlreadyRegisteredEmail = "dan@hotmail.com";
-        var userDummy = new User("dummy", "dan@hotmail.com", "anyhash");
-
-        _userRepositoryMock.Setup(x => x.GetUserByEmail(AlreadyRegisteredEmail)).ReturnsAsync(userDummy);
-        
-        var assertException = await Assert.ThrowsAsync<InvalidOperationException>(()=> userService.CreateNewUSer("danilo", AlreadyRegisteredEmail,"996699"));
-        Assert.Equal("Não foi possível realizar o cadastro", assertException.Message);
-
-        _userRepositoryMock.Verify(x => x.Add(It.IsAny<User>()), Times.Never);
     }
 
 
+    [Theory]
+    [InlineData("")]
+    [InlineData("email@Invalido")]
+    [InlineData("dan@hotmail.com")]
+    public async Task Deve_Não_Criar_Usuario_Com_Email_Ja_Cadastrado_ou_Invalido(string email)
+    {
+        var (connection, provider) = DbTestCongigure();
+        using(connection)
+        using(provider)
+        {
+            var userManager = provider.GetRequiredService<UserManager<User>>();
+            var userService = new UserService(userManager);
+            await userService.CreateNewUSer(new CreateUserRequest (
+                "Davidson",
+                "dan@hotmail.com",
+                "i2&4@678",
+                UserRole.Admin
+            ));    
+            var result = await userService.CreateNewUSer(new CreateUserRequest
+            (
+                "danilo",
+                email,
+                "Q4t3$t26",
+                UserRole.Admin
+            ));    
+            Assert.False(result.Succeeded);
+            Assert.NotEmpty(result.Errors);
+        }
+
+    }
+
+    [Theory]
+    [InlineData ("")]
+    [InlineData ("1234")]
+    public async Task Deve_Não_Criar_Usuario_Com_Senha_Invalida(string password)
+    {
+        var (connection, provider) = DbTestCongigure();
+        using(connection)
+        using(provider)
+        {
+            var userManager = provider.GetRequiredService<UserManager<User>>();
+            var userService = new UserService(userManager);
+            var result = await userService.CreateNewUSer(new CreateUserRequest
+            (
+                "danilo",
+                "dan@hotmail.com",
+                password,
+                UserRole.Admin
+            ));    
+            Assert.False(result.Succeeded);
+            Assert.NotEmpty(result.Errors);
+        }
+
+    }
+
+
+     private (SqliteConnection, ServiceProvider) DbTestCongigure()
+        {
+        var connection = new SqliteConnection("DataSource=:memory:");
+        connection.Open();
+
+        var services = new ServiceCollection();
+
+        services.AddDbContext<SmartKiwiContext>(options =>
+        {
+            options.UseSqlite(connection);
+        });
+
+        services
+            .AddIdentityCore<User>()
+            .AddEntityFrameworkStores<SmartKiwiContext>();
+
+        var provider = services.BuildServiceProvider();
+
+
+        using (var scope = provider.CreateScope())
+        {
+            var context = scope.ServiceProvider
+                .GetRequiredService<SmartKiwiContext>();
+
+            context.Database.EnsureCreated();
+        }
+
+        return (connection, provider);
+    }
 }
