@@ -6,11 +6,9 @@ namespace SmartKiwiApp.Services;
 public class UserService
 {
     private readonly UserManager<User> _userManager;
-    private readonly SignInManager<User> _signInManager;
-    public UserService(UserManager<User> userManager, SignInManager<User> signInManager)
+    public UserService(UserManager<User> userManager)
     {
         _userManager = userManager;
-        _signInManager = signInManager;
     }
     public async Task<IdentityResult> CreateNewUSer(CreateUserRequest userDto)
     {    
@@ -18,7 +16,8 @@ public class UserService
         {
             Name = userDto.Name,
             Email = userDto.Email,
-            UserName = userDto.Email
+            UserName = userDto.Email,
+            UserRole = userDto.Role
         };
         
         return await _userManager.CreateAsync(newUser, userDto.RawPassword);
