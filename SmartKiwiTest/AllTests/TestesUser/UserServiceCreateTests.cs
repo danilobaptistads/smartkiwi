@@ -30,6 +30,28 @@ public class UserServiceCreateTests
 
     }
 
+    [Fact]
+    public async Task Deve_Não_Criar_Usuario_Com_Nome_Vazio()
+    {
+        var (connection, provider) = DbTestCongigure();
+        using(connection)
+        using(provider)
+        {
+            var nomeVazio = "";
+            var userManager = provider.GetRequiredService<UserManager<User>>();
+            var userService = new UserService(userManager);
+            var result = await userService.CreateNewUSer(new CreateUserRequest
+            (
+                nomeVazio,
+                "dan@hotmail.com",
+                "I2&b52016",
+                UserRole.Admin
+            ));    
+            Assert.False(result.Succeeded);
+            Assert.NotEmpty(result.Errors);
+        }
+    }
+
 
     [Theory]
     [InlineData("")]
@@ -62,10 +84,35 @@ public class UserServiceCreateTests
 
     }
 
+    [Fact]
+    public async Task Deve_Não_Criar_Usuario_Com_Senha_Vazia()
+    {
+        var senhaVazia = "";
+        var (connection, provider) = DbTestCongigure();
+        using(connection)
+        using(provider)
+        {
+            var userManager = provider.GetRequiredService<UserManager<User>>();
+            var userService = new UserService(userManager);
+            var result = await userService.CreateNewUSer(new CreateUserRequest
+            (
+                "danilo",
+                "dan@hotmail.com",
+                senhaVazia,
+                UserRole.Admin
+            ));    
+   
+            Assert.Contains(result.Errors, e => e.Code == "PasswordTooShort");
+        }
+
+    }
     [Theory]
-    [InlineData ("")]
-    [InlineData ("1234")]
-    public async Task Deve_Não_Criar_Usuario_Com_Senha_Invalida(string password)
+    [InlineData("Ab1!", "PasswordTooShort")]
+    [InlineData("Abcdefg!", "PasswordRequiresDigit")]
+    [InlineData("abcdef1!", "PasswordRequiresUpper")]
+    [InlineData("ABCDEF1!", "PasswordRequiresLower")]
+    [InlineData("Abcdef12", "PasswordRequiresNonAlphanumeric")]
+    public async Task Deve_Não_Criar_Usuario_Com_Senha_Invalida(string invalidPassword, string expectedError)
     {
         var (connection, provider) = DbTestCongigure();
         using(connection)
@@ -77,15 +124,14 @@ public class UserServiceCreateTests
             (
                 "danilo",
                 "dan@hotmail.com",
-                password,
+                invalidPassword,
                 UserRole.Admin
             ));    
-            Assert.False(result.Succeeded);
-            Assert.NotEmpty(result.Errors);
+   
+            Assert.Contains(result.Errors, e => e.Code == expectedError);
         }
 
     }
-
 
      private (SqliteConnection, ServiceProvider) DbTestCongigure()
         {
