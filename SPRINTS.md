@@ -9,8 +9,8 @@
 
 | Sprint | Foco | Período | Status | Quadro |
 |---|---|---|---|---|
-| **Sprint 1** | Substituir JWT/Argon2 por Identity + Web API | 13/07 - 19/07 | 🔴 Em andamento | [kanban/sprint-01.md](./kanban/sprint-01.md) |
-| **Sprint 2** | API de Autenticação e Ajustes | 20/07 - 26/07 | ⏳ Agendada | [kanban/sprint-02.md](./kanban/sprint-02.md) |
+| **Sprint 1** | Substituir Argon2 por Identity com JWT + Web API | 13/07 - 19/07 | 🔴 Em andamento | [kanban/sprint-01.md](./kanban/sprint-01.md) |
+| **Sprint 2** | Error Handling, Register e Ajustes | 20/07 - 26/07 | ⏳ Agendada | [kanban/sprint-02.md](./kanban/sprint-02.md) |
 | **Sprint 3** | API de Negócio (Filas, Check-in, Chamada) | 27/07 - 02/08 | ⏳ Agendada | [kanban/sprint-03.md](./kanban/sprint-03.md) |
 | **Sprint 4** | Guichê + Painel | 03/08 - 09/08 | ⏳ Agendada | [kanban/sprint-04.md](./kanban/sprint-04.md) |
 

@@ -19,17 +19,17 @@
 
 ### Camada de Repositórios
 - `IClientQueueRepository` / `ClientQueueRepository` — CRUD de filas com persistência
-- `IUserRepository` / `UserRepository` — CRUD de usuários (a ser substituído pelo Identity)
-- `IClientRepository` — Interface definida (implementação pendente)
+- `IUserRepository` / `UserRepository` — substituído por Identity (removido)
+- `IClientRepository` / `ClientRepository` — CRUD de clientes implementado
 
 ### Camada de Serviços
 - `ClientQueueService` — CRUD de filas com validações básicas
 - `CheckinService` — Geração de ticket e enfileiramento de clientes
 - `AtendanteService` — Processamento da próxima chamada via QueueEngine
-- `UserService` — Cadastro, autenticação e gerenciamento de usuários (a ser migrado para Identity)
-- `PasswordService` — Hash e validação de senha (será removido com Identity)
-- `HashService` — Implementação Argon2id (será removido com Identity)
-- `TokenService` — Geração/validação de JWT (será removido com Identity)
+- `UserService` — Cadastro, autenticação e gerenciamento de usuários (migrado para Identity)
+- `PasswordService` — removido (substituído por Identity)
+- `HashService` — removido (substituído por Identity)
+- `TokenService` (legado) — removido; novo `TokenService` a ser criado para emissão de JWT via Identity
 
 ### Motor de Filas
 - `QueueEngine` — Engine de seleção de filas com algoritmo round-robin ponderado por prioridade
@@ -57,22 +57,22 @@
 
 #### 1. Integração com ASP.NET Core Identity
 
-**User Story:** Como administrador do sistema, quero que a autenticação seja gerenciada pelo ASP.NET Core Identity com cookies, para que o login seja seguro e padronizado sem código customizado.
+**User Story:** Como administrador do sistema, quero que a autenticação seja gerenciada pelo ASP.NET Core Identity com JWT, para que o login seja seguro e padronizado sem código customizado.
 
 **Critérios de Aceite:**
-- [ ] `User.cs` estende `IdentityUser<Guid>` com propriedades extras `Name` (string) e `UserRole` (enum Role)
-- [ ] Campo `Email` herdado do Identity, não declarado manualmente
-- [ ] Campo `PasswordHash` herdado do Identity
-- [ ] `SmartKiwiContext` estende `IdentityDbContext<User, IdentityRole<Guid>, Guid>`
-- [ ] Adicionar pacote `Microsoft.AspNetCore.Identity.EntityFrameworkCore`
-- [ ] Remover pacote `Microsoft.AspNetCore.Authentication.JwtBearer`
-- [ ] Remover arquivos: `JwtConfig.cs`, `TokenService.cs`, `PasswordService.cs`, `HashService.cs`
-- [ ] Remover interfaces: `ITokenService`, `IPasswordService`, `IHashService`
+- [x] `User.cs` estende `IdentityUser<Guid>` com propriedades extras `Name` (string) e `UserRole` (enum Role)
+- [x] Campo `Email` herdado do Identity, não declarado manualmente
+- [x] Campo `PasswordHash` herdado do Identity
+- [x] `SmartKiwiContext` estende `IdentityDbContext<User, IdentityRole<Guid>, Guid>`
+- [x] Adicionar pacote `Microsoft.AspNetCore.Identity.EntityFrameworkCore`
+- [ ] Manter pacote `Microsoft.AspNetCore.Authentication.JwtBearer` (configurar para emitir/validar JWT via Identity)
+- [x] Remover arquivos legados: `JwtConfig.cs`, `TokenService.cs` (antigo), `PasswordService.cs`, `HashService.cs`
+- [x] Remover interfaces legadas: `ITokenService`, `IPasswordService`, `IHashService`
 - [ ] Configurar Identity no pipeline com regras de senha:
   - Mínimo 8 caracteres
   - Exigir maiúscula, minúscula, dígito e caractere especial
   - Exigir email único
-- [ ] Configurar autenticação via cookie (`AddCookie`) com `HttpOnly`, `SameSite=Strict`
+- [ ] Configurar autenticação via JWT (`AddJwtBearer`)
 - [ ] Configurar autorização com as roles `Admin` e `Employee`
 - [ ] Criar roles `Admin` e `Employee` no startup via `RoleManager`
 
@@ -125,15 +125,14 @@
 
 #### 4. Endpoints de Autenticação
 
-**User Story:** Como operador, quero fazer login e logout no sistema para acessar as funcionalidades protegidas.
+**User Story:** Como operador, quero fazer login no sistema e acessar meus dados para utilizar as funcionalidades protegidas.
 
 **Critérios de Aceite:**
-- [ ] `POST /api/auth/login` — Recebe `{ email, password }`, usa `SignInManager`, retorna cookie
+- [ ] `POST /api/auth/login` — Recebe `{ email, password }`, retorna `{ token, expiresAt }`
 - [ ] `POST /api/auth/register` — Apenas Admin, cria novo operador via `UserManager`
-- [ ] `POST /api/auth/logout` — Limpa o cookie de autenticação
-- [ ] `GET /api/auth/me` — Retorna dados do usuário autenticado
+- [ ] `GET /api/auth/me` — Retorna dados do usuário autenticado via JWT
 - [ ] Rotas protegidas com `[Authorize]` e `[Authorize(Roles = "Admin")]`
-- [ ] Testes: senha inválida → 401, email não cadastrado → 401, acesso não autenticado → 401
+- [ ] Testes: senha inválida → 401, email não cadastrado → 401, acesso não autenticado → 401, register sem role Admin → 403
 
 **Regras de Negócio:**
 - RN04: Apenas usuários com role `Admin` podem acessar `POST /api/auth/register`
@@ -201,7 +200,7 @@
 - [ ] `PUT    /api/queues/{id}/priority` — Atualiza prioridade
 - [ ] `PUT    /api/queues/{id}/prefix` — Atualiza prefixo
 - [ ] `DELETE /api/queues/{id}` — Remove fila
-- [ ] Todos os endpoints exigem autenticação via cookie
+- [ ] Todos os endpoints exigem autenticação via JWT
 - [ ] Respostas REST: 201 (criação), 204 (sucesso sem corpo), 400 (validação), 401 (não autenticado), 404 (não encontrado)
 
 **Prioridade:** 🟢 Média-Baixa
@@ -297,8 +296,8 @@
 
 | Prioridade | Sprint | Itens |
 |---|:---:|---|
-| 🔴 Alta | Sprint 1 | Identity, UserService migração, Web API |
-| 🟡 Média | Sprint 2 | Endpoints auth, Error handling, ClientRepository, validações |
+| 🔴 Alta | Sprint 1 | Identity, UserService migração, Web API, AuthController (login, me, register) |
+| 🟡 Média | Sprint 2 | Error handling, register protegido, ClientRepository (DI), validações |
 | 🟢 Média-Baixa | Sprint 3 | CRUD filas API, Check-in API, Chamada API |
 | 🔵 Baixa | Sprint 4 | Guichê, Painel |
 

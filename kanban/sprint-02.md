@@ -1,6 +1,6 @@
-# Sprint 2 — API de Autenticação e Ajustes
+# Sprint 2 — Error Handling, Register, Ajustes
 
-> **Sprint Goal:** Expor endpoints de autenticação, padronizar respostas de erro e ajustar pendências técnicas.
+> **Sprint Goal:** Implementar tratamento global de erros, finalizar endpoints de autenticação pendentes e ajustar pendências técnicas.
 >
 > **Período:** 20/07/2026 a 26/07/2026
 
@@ -8,24 +8,29 @@
 
 ## A Fazer
 
-- [ ] **4.1** `POST /api/auth/login` — recebe `{ email, password }`, usa `SignInManager`, retorna cookie
-- [ ] **4.2** `POST /api/auth/register` — apenas Admin, cria novo operador via `UserManager`
-- [ ] **4.3** `POST /api/auth/logout` — limpa o cookie de autenticação
-- [ ] **4.4** `GET /api/auth/me` — retorna dados do usuário autenticado
-- [ ] **4.5** Rotas protegidas com `[Authorize]` e `[Authorize(Roles = "Admin")]`
-- [ ] **4.6** Testes: senha inválida → 401, email não cadastrado → 401, acesso não autenticado → 401
-- [ ] **5.1** Middleware captura `ArgumentException` → 400 Bad Request
-- [ ] **5.2** Middleware captura `InvalidOperationException` → 409 Conflict
-- [ ] **5.3** Middleware captura `UnauthorizedAccessException` → 401 Unauthorized
-- [ ] **5.4** Middleware captura `NotFoundException` → 404 Not Found
-- [ ] **5.5** Erros não mapeados → 500 Internal Server Error
-- [ ] **6.1** `ClientRepository : IClientRepository` com `Add`, `GetRemainClients`, `RemoveClient`
-- [ ] **6.2** Injeção de `SmartKiwiContext` via construtor
-- [ ] **6.3** Registrado no DI
-- [ ] **7.1** Validação de nome extraída para método privado reutilizável (`ValidateQueueName()`)
-- [ ] **7.2** Validação de prioridade extraída para método privado reutilizável (`ValidateQueuePriority()`)
-- [ ] **7.3** Ambos os métodos usados tanto no Create quanto no Update
-- [ ] **7.4** Todos os testes de `ClientQueueTests` passam
+### 4. Endpoints de Autenticação (complemento)
+
+- [ ] **4.2-a [TEST]** Escrever testes para `POST /api/auth/register` (Admin cria, não-Admin → 403, email duplicado → 400)
+- [ ] **4.2-b [IMPL]** Garantir `POST /api/auth/register` com proteção `[Authorize(Roles = "Admin")]`
+- [ ] **4.4** Configurar `[Authorize]` e `[Authorize(Roles = "Admin")]` nas rotas existentes
+
+### 5. Tratamento Global de Erros
+
+- [ ] **5.1-a [TEST]** Escrever testes para middleware de erro (ArgumentException → 400, InvalidOperation → 409, Unauthorized → 401, NotFound → 404)
+- [ ] **5.1-b [IMPL]** Implementar middleware de erro global com JSON padronizado
+- [ ] **5.1-c** Registrar middleware no pipeline do `Program.cs`
+
+### 6. ClientRepository
+
+- [ ] **6.1-a [TEST]** Escrever testes para `ClientRepository` (Add, GetRemainClients, RemoveClient)
+- [ ] **6.1-c** Registrar `ClientRepository` no DI (implementação já existe)
+
+### 7. Centralizar Validações em ClientQueueService
+
+- [ ] **7.1-a [TEST]** Escrever testes para validações extraídas (nome e prioridade)
+- [ ] **7.1-b [IMPL]** Extrair `ValidateQueueName()` e `ValidateQueuePriority()` para métodos privados reutilizáveis
+- [ ] **7.1-c** Usar ambos os métodos no Create e Update
+- [ ] **7.1-d** Verificar que todos os testes de `ClientQueueTests` passam
 
 ---
 
@@ -49,5 +54,7 @@
 
 ## 📝 Observações
 
-- Depende da Sprint 1 (Identity + Web API) estar concluída.
-- `AuthController` será o primeiro controller Web API do projeto.
+- Depende da Sprint 1 (Identity + JWT + Web API + AuthController) estar concluída.
+- Login e Me foram implementados na Sprint 1 — Sprint 2 complementa com register e testes.
+- `ClientRepository` já existe no código — cartão 6.1-b removido.
+- Sprint segue TDD: [TEST] antes de [IMPL] para cada funcionalidade.
