@@ -1,47 +1,55 @@
-// using Moq;
-// using SmartKiwiApp.Data;
-// using SmartKiwiApp.Models;
-// using SmartKiwiApp.Services;
-// using SmartKiwiApp.Repository;
-// public class UserServiceUpdateTests
-// {
-//     private readonly Mock<ITokenService> _tokenServiceMock;
-//     private readonly Mock<IUserRepository> _userRepositoryMock;
-//     private readonly Mock<IPasswordService> _passwordServiceMock;
-//     private readonly UserService _userService;
-//     public UserServiceUpdateTests()
-//     {
-//         _tokenServiceMock = new Mock<ITokenService>();
-//         _userRepositoryMock = new Mock<IUserRepository>();
-//         _passwordServiceMock = new Mock<IPasswordService>();
-//         _userService = new UserService( _userRepositoryMock.Object, _passwordServiceMock.Object, _tokenServiceMock.Object);
-//     }
+using SmartKiwiApp.Dto;
+using SmartKiwiApp.Data;
+using SmartKiwiApp.Models;
+using SmartKiwiApp.Services;
+using Microsoft.Data.Sqlite;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+public class UserServiceUpdateTests
+{
 
-//     [Fact]
-//     public async Task Deve_Chamar_Metodo_UpdateName()
-//     {
-//         var currentUSer = new User("Danilo", "da@hotmail.com", "!T12@45");
-//         var IdCurrentUser = currentUSer.Id;
-//         _userRepositoryMock.Setup(x => x.GetUserById(IdCurrentUser)).ReturnsAsync(currentUSer);
-//         _userRepositoryMock.Setup(x => x.UpdateName(It.IsAny<User>(),"Dan")).Returns(Task.CompletedTask);
+    [Fact]
+    public async Task Deve_Fazer_Update_Do_Nome()
+    {
+        var (connection, provider) = CreateTestEnvironment();
+        using(connection)
+        using(provider)
+        {
+            var userManager = provider.GetRequiredService<UserManager<User>>();
+            var userService = new UserService(userManager);
+            await userService.CreateNewUSer(new CreateUserRequest
+            (
+                "danilo",
+                "dan@hotmail.com",
+                "Q4t3$t26",
+                UserRole.Admin
+            ));    
+            var userToUpdate = await userManager.FindByEmailAsync("dan@hotmail.com");
+            var dto = new UpdateNameRequest( userToUpdate!.Id.ToString(), "Dan" );
+            await userService.UpdateUserName(dto);
+            var result  = await userManager.FindByIdAsync(userToUpdate!.Id.ToString());
+            Assert.Equal("Dan", result!.Name);
+                   
+        }
+    }
+    [Fact]
+    public async Task Deve_Não_Chamar_Metodo_UpdateName_Se_Usuario_Não_Encontrado()
+    {
+        var (connection, provider) = CreateTestEnvironment();
+        using(connection)
+        using(provider)
+        {
+            var userManager = provider.GetRequiredService<UserManager<User>>();
+            var userService = new UserService(userManager);
+            var wrongId = Guid.NewGuid();
+            var dto = new UpdateNameRequest( wrongId.ToString(), "Dan" );
+            var result =  await userService.UpdateUserName(dto);
+            Assert.False(result.Succeeded);
+            Assert.Equal("UserNotFound", result.Errors.First().Code);
 
-//         await _userService.UpdateUserName(IdCurrentUser,"Dan");
-        
-//          _userRepositoryMock.Verify(x => x.UpdateName(It.IsAny<User>(),"Dan"), Times.Once);
-        
-//     }
-//     [Fact]
-//     public async Task Deve_Não_Chamar_Metodo_UpdateName_Se_Usuario_Não_Encontrado()
-//     {
-//         var currentUSer = new User("Danilo", "da@hotmail.com", "!T12@45");
-//         var wrongId = Guid.NewGuid();
-//         _userRepositoryMock.Setup(x => x.GetUserById(wrongId)).ReturnsAsync((User?)null);
- 
-//         await Assert.ThrowsAsync<ArgumentException>(() => _userService.UpdateUserName(wrongId,"Dan"));
-        
-//         _userRepositoryMock.Verify(x => x.UpdateName(It.IsAny<User>(),"Dan"), Times.Never);
-        
-//     }
+        }
+    }
 
 //     [Fact]
 //     public async Task Deve_Chamar_Metodo_UpdateEmail_Se_Senha_válida()
@@ -172,4 +180,50 @@
 
 //         _userRepositoryMock.Verify(x => x.DeleteUser(It.IsAny<User>()), Times.Never);
 //     }
-// }
+
+
+     private (SqliteConnection, ServiceProvider) CreateTestEnvironment()
+        {
+        var connection = new SqliteConnection("DataSource=:memory:");
+        connection.Open();
+
+        var services = new ServiceCollection();
+
+        services.AddDbContext<SmartKiwiContext>(options =>
+        {
+            options.UseSqlite(connection);
+        });
+
+        services
+            .AddIdentityCore<User>(options => 
+            {
+                options.User.RequireUniqueEmail =true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireDigit = true;
+                options.Password.RequireUppercase =true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                
+            })
+            .AddUserValidator<EmailValidator>()
+            .AddUserValidator<CustomUserValidator>()
+            .AddEntityFrameworkStores<SmartKiwiContext>();
+            
+
+
+        var provider = services.BuildServiceProvider();
+
+
+        using (var scope = provider.CreateScope())
+        {
+            var context = scope.ServiceProvider
+                .GetRequiredService<SmartKiwiContext>();
+
+            context.Database.EnsureCreated();
+        }
+
+        return (connection, provider);
+    }
+
+}
+

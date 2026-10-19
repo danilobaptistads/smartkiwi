@@ -28,7 +28,11 @@ public class UserService
         var userToUpdate = await _userManager.FindByIdAsync(userDto.Id);
         if(userToUpdate == null)
         {
-            return IdentityResult.Failed();
+            return IdentityResult.Failed(new IdentityError
+                {
+                    Code = "UserNotFound",
+                    Description = "Usuario não encontrado."
+                });
         }
         userToUpdate.Name = userDto.NewName;
         

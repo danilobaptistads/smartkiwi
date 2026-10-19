@@ -17,8 +17,6 @@
 ### **1.6-c** Definir chave de assinatura JWT (`appsettings.json` ou User Secrets)
 
 
-### **1.9** Configurar Identity no pipeline (regras de senha: 8 chars, maiúscula, minúscula, dígito, especial, email único)
-
 
 ### **1.6-d** Configurar `AddJwtBearer()` no pipeline (validação: issuer, audience, signing key)
 
@@ -47,9 +45,6 @@
 ### Testes e Finalização
 
 
-### **2.9-a [TEST]** Refatorar testes existentes do UserService para funcionar com Identity
-
-
 ### **2.9-b** Remover testes legados (`PasswordServiceTests`, `HashServiceTests`, `TokenServiceTests`)
 
 
@@ -62,6 +57,9 @@
 ## Em Andamento
 
 ### **3.3** Serviços registrados no DI (DbContext, Services, Identity, TokenService)
+
+
+### **2.9-a [TEST]** Refatorar testes existentes do UserService para funcionar com Identity (parcial — só CreateTests)
 
 
 ## Concluído
@@ -126,6 +124,9 @@
 ### **2.1** `CreateNewUser()` usar `UserManager.CreateAsync()`
 
 
+### **1.9** Configurar Identity no pipeline (regras de senha: 8 chars, maiúscula, minúscula, dígito, especial, email único)
+
+
 ### **1.7** Remover arquivos: `JwtConfig.cs`, `TokenService.cs` (antigo), `PasswordService.cs`, `HashService.cs`
 
 
@@ -142,7 +143,7 @@
 ### **3.2 (Program.cs) é o cartão mais crítico** — sem ele, nenhum pipeline funciona. Posicionado como primeiro de `A Fazer`.
 
 
-### UserService implementado, testes sendo refatorados (2.9-a).
+### `EmailValidator` e `CustomUserValidator` criados e registrados no pipeline.
 
 
 ### Sprint Goal revisado: cookies → JWT (aprovado PO).

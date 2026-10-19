@@ -78,7 +78,6 @@ public class UserServiceCreateTests
 
     }
 
-    
     [Fact]
     public async Task Deve_Não_Criar_Usuario_Com_Email_Ja_Cadastrado()
     {
